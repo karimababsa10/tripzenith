@@ -20,102 +20,60 @@ const { Content } = await render(article);
 
 const allArticles = await getCollection("articles");
 
-const slugify = (value) =>
-  value
-    .toLowerCase()
-    .trim()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "");
-
-/* Destination URLs */
-
-const regionSlug = slugify(article.data.region);
-const countrySlug = slugify(article.data.country);
-const citySlug = slugify(article.data.destination);
-
-const regionURL = `/destinations/${regionSlug}/`;
-const countryURL = `/destinations/${countrySlug}/`;
-const cityURL = `/destinations/${countrySlug}/${citySlug}/`;
+const relatedArticles = allArticles
+  .filter((item) => item.id !== article.id)
+  .filter(
+    (item) =>
+      item.data.destination === article.data.destination ||
+      item.data.country === article.data.country ||
+      item.data.region === article.data.region
+  )
+  .sort(
+    (a, b) =>
+      b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
+  )
+  .slice(0, 3);
 
 const canonicalURL = new URL(
   `/articles/${article.id}/`,
   "https://tripzenith.com"
-);
+).toString();
 
-/* Related Articles */
+const socialImage = article.data.image
+  ? new URL(article.data.image, "https://tripzenith.com").toString()
+  : "https://tripzenith.com/favicon.svg";
 
-const relatedArticles = allArticles
-  .filter((item) => item.id !== article.id)
-  .sort((a, b) => {
-    const score = (item) => {
-      let points = 0;
-
-      if (
-        item.data.destination === article.data.destination
-      ) {
-        points += 3;
-      }
-
-      if (
-        item.data.country === article.data.country
-      ) {
-        points += 2;
-      }
-
-      if (
-        item.data.region === article.data.region
-      ) {
-        points += 1;
-      }
-
-      return points;
-    };
-
-    return score(b) - score(a);
-  })
-  .slice(0, 3);
-
-/* Article Schema */
-
-const schema = {
+const articleSchema = {
   "@context": "https://schema.org",
   "@type": "Article",
   headline: article.data.title,
   description: article.data.description,
+  image: socialImage,
   datePublished: article.data.pubDate.toISOString(),
   dateModified: article.data.pubDate.toISOString(),
-
   author: {
     "@type": "Organization",
     name: "TripZenith",
+    url: "https://tripzenith.com/",
   },
-
   publisher: {
     "@type": "Organization",
     name: "TripZenith",
+    url: "https://tripzenith.com/",
+    logo: {
+      "@type": "ImageObject",
+      url: "https://tripzenith.com/favicon.svg",
+    },
   },
-
   mainEntityOfPage: {
     "@type": "WebPage",
-    "@id": canonicalURL.toString(),
+    "@id": canonicalURL,
   },
-
-  ...(article.data.image
-    ? {
-        image: new URL(
-          article.data.image,
-          "https://tripzenith.com"
-        ).toString(),
-      }
-    : {}),
 };
-
-/* Breadcrumb Schema */
 
 const breadcrumbSchema = {
   "@context": "https://schema.org",
   "@type": "BreadcrumbList",
-
   itemListElement: [
     {
       "@type": "ListItem",
@@ -123,33 +81,29 @@ const breadcrumbSchema = {
       name: "Home",
       item: "https://tripzenith.com/",
     },
-
     {
       "@type": "ListItem",
       position: 2,
-      name: article.data.region,
-      item: `https://tripzenith.com${regionURL}`,
+      name: "Blog",
+      item: "https://tripzenith.com/blog/",
     },
-
     {
       "@type": "ListItem",
       position: 3,
-      name: article.data.country,
-      item: `https://tripzenith.com${countryURL}`,
+      name: article.data.destination,
+      item: `https://tripzenith.com/destinations/${article.data.country
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-+|-+$/g, "")}/${article.data.destination
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-+|-+$/g, "")}/`,
     },
-
     {
       "@type": "ListItem",
       position: 4,
-      name: article.data.destination,
-      item: `https://tripzenith.com${cityURL}`,
-    },
-
-    {
-      "@type": "ListItem",
-      position: 5,
       name: article.data.title,
-      item: canonicalURL.toString(),
+      item: canonicalURL,
     },
   ],
 };
@@ -158,743 +112,574 @@ const breadcrumbSchema = {
 <BaseLayout
   title={article.data.title}
   description={article.data.description}
+  image={article.data.image}
 >
-  <article class="article-page">
+  <Fragment slot="head">
+    <meta
+      property="article:published_time"
+      content={article.data.pubDate.toISOString()}
+    />
 
-    <!-- Breadcrumbs -->
+    <script
+      type="application/ld+json"
+      set:html={JSON.stringify(articleSchema)}
+    />
 
-    <nav
-      class="breadcrumbs"
-      aria-label="Breadcrumb"
-    >
-      <a href="/">Home</a>
+    <script
+      type="application/ld+json"
+      set:html={JSON.stringify(breadcrumbSchema)}
+    />
+  </Fragment>
 
-      <span>›</span>
+  <main class="article-page">
+    <div class="container">
 
-      <a href={regionURL}>
-        {article.data.region}
-      </a>
+      <nav class="breadcrumbs" aria-label="Breadcrumb">
+        <a href="/">Home</a>
+        <span>/</span>
 
-      <span>›</span>
+        <a href="/blog/">Blog</a>
+        <span>/</span>
 
-      <a href={countryURL}>
-        {article.data.country}
-      </a>
+        <a href={`/destinations/${article.data.country
+          .toLowerCase()
+          .replace(/[^a-z0-9]+/g, "-")
+          .replace(/^-+|-+$/g, "")}/${article.data.destination
+          .toLowerCase()
+          .replace(/[^a-z0-9]+/g, "-")
+          .replace(/^-+|-+$/g, "")}/`}>
+          {article.data.destination}
+        </a>
 
-      <span>›</span>
+        <span>/</span>
 
-      <a href={cityURL}>
-        {article.data.destination}
-      </a>
+        <span>{article.data.title}</span>
+      </nav>
 
-      <span>›</span>
+      <div class="article-layout">
 
-      <span class="current">
-        {article.data.title}
-      </span>
-    </nav>
+        <article class="article">
 
+          <header class="article-header">
 
-    <!-- Article Header -->
+            <div class="article-category">
+              {article.data.category}
+            </div>
 
-    <header class="article-header">
+            <h1>{article.data.title}</h1>
 
-      <p class="eyebrow">
-        TRIPZENITH TRAVEL GUIDE
-      </p>
+            <p class="article-description">
+              {article.data.description}
+            </p>
 
-      <h1>
-        {article.data.title}
-      </h1>
+            <div class="article-meta">
+              <span>
+                {article.data.destination}
+              </span>
 
-      <p class="description">
-        {article.data.description}
-      </p>
+              <span>•</span>
 
-      <div class="meta">
+              <time datetime={article.data.pubDate.toISOString()}>
+                {article.data.pubDate.toLocaleDateString("en-US", {
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
+                })}
+              </time>
+            </div>
 
-        <span>
-          {article.data.pubDate.toLocaleDateString(
-            "en-US",
-            {
-              year: "numeric",
-              month: "long",
-              day: "numeric",
-            }
+          </header>
+
+          {article.data.image && (
+            <figure class="hero-image">
+              <img
+                src={article.data.image}
+                alt={article.data.title}
+                width="1200"
+                height="675"
+                loading="eager"
+                decoding="async"
+              />
+            </figure>
           )}
-        </span>
 
-        <span>•</span>
+          <div class="article-content">
+            <Content />
+          </div>
 
-        <span>
-          TripZenith
-        </span>
+        </article>
 
-      </div>
+        <aside class="sidebar">
 
-    </header>
+          <div class="sidebar-box">
 
+            <h2>Plan Your Trip</h2>
 
-    <!-- Hero Image -->
+            <p>
+              Discover more travel guides, destinations, and practical tips
+              for your next adventure.
+            </p>
 
-    {article.data.image && (
-      <div class="hero-image">
+            <a href="/destinations/" class="sidebar-button">
+              Explore Destinations
+            </a>
 
-        <img
-          src={article.data.image}
-          alt={article.data.title}
-          loading="eager"
-          fetchpriority="high"
-          decoding="async"
-          sizes="(max-width: 700px) 100vw, 900px"
-        />
+          </div>
 
-      </div>
-    )}
+          <div class="sidebar-box">
 
+            <h2>Explore More</h2>
 
-    <!-- Article Content -->
+            <ul>
+              <li>
+                <a href="/blog/">Travel Guides</a>
+              </li>
 
-    <div class="article-content">
+              <li>
+                <a href="/destinations/">Destinations</a>
+              </li>
 
-      <Content />
+              <li>
+                <a href="/about/">About TripZenith</a>
+              </li>
+            </ul>
 
-    </div>
+          </div>
 
-
-    <!-- Destination Links -->
-
-    <section class="destination-links">
-
-      <p class="section-label">
-        EXPLORE MORE
-      </p>
-
-      <div class="destination-grid">
-
-        <a
-          href={regionURL}
-          class="destination-card"
-        >
-          <span>Region</span>
-
-          <strong>
-            {article.data.region}
-          </strong>
-        </a>
-
-
-        <a
-          href={countryURL}
-          class="destination-card"
-        >
-          <span>Country</span>
-
-          <strong>
-            {article.data.country}
-          </strong>
-        </a>
-
-
-        <a
-          href={cityURL}
-          class="destination-card"
-        >
-          <span>City</span>
-
-          <strong>
-            {article.data.destination}
-          </strong>
-        </a>
+        </aside>
 
       </div>
 
-    </section>
+      {relatedArticles.length > 0 && (
+        <section class="related-section">
 
+          <div class="section-heading">
+            <span>More Travel Guides</span>
+            <h2>You May Also Like</h2>
+          </div>
 
-    <!-- Related Articles -->
+          <div class="related-grid">
 
-    {relatedArticles.length > 0 && (
+            {relatedArticles.map((related) => (
+              <a
+                class="related-card"
+                href={`/articles/${related.id}/`}
+              >
 
-      <section class="related-section">
-
-        <p class="section-label">
-          KEEP EXPLORING
-        </p>
-
-        <h2>
-          More travel guides
-        </h2>
-
-        <div class="related-grid">
-
-          {relatedArticles.map((related) => (
-
-            <article class="related-card">
-
-              {related.data.image && (
-
-                <a
-                  href={`/articles/${related.id}/`}
-                  class="related-image"
-                >
-
+                {related.data.image && (
                   <img
                     src={related.data.image}
                     alt={related.data.title}
                     loading="lazy"
-                    decoding="async"
-                    sizes="(max-width: 700px) 100vw, 300px"
+                    width="600"
+                    height="338"
                   />
+                )}
 
-                </a>
+                <div class="related-card-content">
 
-              )}
+                  <span class="related-category">
+                    {related.data.category}
+                  </span>
 
+                  <h3>{related.data.title}</h3>
 
-              <div class="related-content">
+                  <p>{related.data.description}</p>
 
-                <p class="related-location">
-                  {related.data.destination},{" "}
-                  {related.data.country}
-                </p>
+                  <span class="read-more">
+                    Read Guide →
+                  </span>
 
+                </div>
 
-                <h3>
+              </a>
+            ))}
 
-                  <a
-                    href={`/articles/${related.id}/`}
-                  >
-                    {related.data.title}
-                  </a>
+          </div>
 
-                </h3>
+        </section>
+      )}
 
+      <section class="final-cta">
 
-                <p class="related-description">
-                  {related.data.description}
-                </p>
+        <span>TRIPZENITH</span>
 
+        <h2>Keep Exploring</h2>
 
-                <a
-                  href={`/articles/${related.id}/`}
-                  class="read"
-                >
-                  Read guide →
-                </a>
+        <p>
+          Find your next destination and discover unforgettable things to do
+          around the world.
+        </p>
 
-              </div>
-
-            </article>
-
-          ))}
-
-        </div>
+        <a href="/destinations/">
+          Explore Destinations →
+        </a>
 
       </section>
 
-    )}
-
-
-    <!-- Final CTA -->
-
-    <section class="article-footer">
-
-      <p class="eyebrow">
-        KEEP EXPLORING
-      </p>
-
-      <h2>
-        Discover your next destination.
-      </h2>
-
-      <a
-        href="/blog/"
-        class="button"
-      >
-        Explore the travel blog →
-      </a>
-
-    </section>
-
-  </article>
-
-
-  <!-- Article Schema -->
-
-  <script
-    type="application/ld+json"
-    set:html={JSON.stringify(schema)}
-  />
-
-
-  <!-- Breadcrumb Schema -->
-
-  <script
-    type="application/ld+json"
-    set:html={JSON.stringify(breadcrumbSchema)}
-  />
-
+    </div>
+  </main>
 </BaseLayout>
 
-
 <style>
-
-.article-page {
-  max-width: 900px;
-  margin: 0 auto;
-  padding-bottom: 5rem;
-}
-
-
-/* Breadcrumbs */
-
-.breadcrumbs {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 0.5rem;
-
-  margin-bottom: 3rem;
-
-  color: #777;
-  font-size: 0.8rem;
-}
-
-.breadcrumbs a {
-  color: #555;
-  text-decoration: none;
-}
-
-.breadcrumbs a:hover {
-  color: #111;
-}
-
-.breadcrumbs .current {
-  max-width: 280px;
-
-  overflow: hidden;
-
-  text-overflow: ellipsis;
-
-  white-space: nowrap;
-}
-
-
-/* Article Header */
-
-.article-header {
-  max-width: 800px;
-  margin-bottom: 3rem;
-}
-
-.eyebrow {
-  margin-bottom: 1rem;
-
-  color: #777;
-
-  font-size: 0.72rem;
-
-  font-weight: 700;
-
-  letter-spacing: 0.16em;
-}
-
-.article-header h1 {
-  margin-bottom: 1.5rem;
-
-  color: #111;
-
-  font-size: clamp(
-    2.7rem,
-    6vw,
-    5rem
-  );
-
-  line-height: 1;
-
-  letter-spacing: -0.055em;
-}
-
-.description {
-  margin-bottom: 1.5rem;
-
-  color: #666;
-
-  font-size: 1.15rem;
-
-  line-height: 1.7;
-}
-
-.meta {
-  display: flex;
-
-  gap: 0.6rem;
-
-  color: #888;
-
-  font-size: 0.82rem;
-}
-
-
-/* Hero */
-
-.hero-image {
-  width: 100%;
-
-  aspect-ratio: 16 / 9;
-
-  margin-bottom: 4rem;
-
-  overflow: hidden;
-
-  border-radius: 24px;
-}
-
-.hero-image img {
-  width: 100%;
-
-  height: 100%;
-
-  display: block;
-
-  object-fit: cover;
-}
-
-
-/* Article Content */
-
-.article-content {
-  max-width: 760px;
-
-  margin: 0 auto;
-
-  color: #333;
-
-  font-size: 1.05rem;
-
-  line-height: 1.85;
-}
-
-.article-content :global(h2) {
-  margin-top: 3rem;
-
-  margin-bottom: 1rem;
-
-  color: #111;
-
-  font-size: 2rem;
-
-  line-height: 1.2;
-
-  letter-spacing: -0.03em;
-}
-
-.article-content :global(h3) {
-  margin-top: 2rem;
-
-  margin-bottom: 0.8rem;
-
-  color: #111;
-
-  font-size: 1.4rem;
-}
-
-.article-content :global(p) {
-  margin-bottom: 1.4rem;
-}
-
-.article-content :global(ul),
-.article-content :global(ol) {
-  margin-bottom: 1.5rem;
-
-  padding-left: 1.5rem;
-}
-
-.article-content :global(li) {
-  margin-bottom: 0.5rem;
-}
-
-.article-content :global(a) {
-  color: #111;
-
-  font-weight: 600;
-}
-
-
-/* Destination Links */
-
-.destination-links {
-  margin-top: 5rem;
-
-  padding-top: 3rem;
-
-  border-top: 1px solid #e8e8e5;
-}
-
-.section-label {
-  margin-bottom: 1rem;
-
-  color: #777;
-
-  font-size: 0.72rem;
-
-  font-weight: 700;
-
-  letter-spacing: 0.16em;
-}
-
-.destination-grid {
-  display: grid;
-
-  grid-template-columns:
-    repeat(3, 1fr);
-
-  gap: 1rem;
-}
-
-.destination-card {
-  display: flex;
-
-  flex-direction: column;
-
-  gap: 0.4rem;
-
-  padding: 1.5rem;
-
-  border: 1px solid #e8e8e5;
-
-  border-radius: 16px;
-
-  color: #111;
-
-  text-decoration: none;
-
-  transition:
-    transform 0.2s ease,
-    box-shadow 0.2s ease;
-}
-
-.destination-card:hover {
-  transform: translateY(-3px);
-
-  box-shadow:
-    0 10px 30px
-    rgba(0, 0, 0, 0.06);
-}
-
-.destination-card span {
-  color: #888;
-
-  font-size: 0.75rem;
-}
-
-.destination-card strong {
-  font-size: 1.05rem;
-}
-
-
-/* Related Articles */
-
-.related-section {
-  margin-top: 5rem;
-
-  padding-top: 3rem;
-
-  border-top: 1px solid #e8e8e5;
-}
-
-.related-section h2 {
-  margin-bottom: 2rem;
-
-  font-size: 2rem;
-
-  letter-spacing: -0.04em;
-}
-
-.related-grid {
-  display: grid;
-
-  grid-template-columns:
-    repeat(3, 1fr);
-
-  gap: 1.2rem;
-}
-
-.related-card {
-  overflow: hidden;
-
-  border: 1px solid #e8e8e5;
-
-  border-radius: 18px;
-
-  background: #fff;
-
-  transition:
-    transform 0.2s ease,
-    box-shadow 0.2s ease;
-}
-
-.related-card:hover {
-  transform: translateY(-3px);
-
-  box-shadow:
-    0 10px 30px
-    rgba(0, 0, 0, 0.06);
-}
-
-.related-image {
-  display: block;
-
-  height: 180px;
-
-  overflow: hidden;
-}
-
-.related-image img {
-  width: 100%;
-
-  height: 100%;
-
-  display: block;
-
-  object-fit: cover;
-}
-
-.related-content {
-  padding: 1.3rem;
-}
-
-.related-location {
-  margin-bottom: 0.5rem;
-
-  color: #777;
-
-  font-size: 0.75rem;
-
-  font-weight: 600;
-}
-
-.related-content h3 {
-  margin-bottom: 0.8rem;
-
-  font-size: 1.15rem;
-
-  line-height: 1.25;
-}
-
-.related-content h3 a {
-  color: #111;
-
-  text-decoration: none;
-}
-
-.related-description {
-  margin-bottom: 1rem;
-
-  color: #666;
-
-  font-size: 0.9rem;
-
-  line-height: 1.6;
-}
-
-.read {
-  color: #111;
-
-  font-size: 0.85rem;
-
-  font-weight: 700;
-
-  text-decoration: none;
-}
-
-
-/* Footer CTA */
-
-.article-footer {
-  margin-top: 5rem;
-
-  padding: 4rem 2rem;
-
-  border-radius: 24px;
-
-  background: #f5f5f2;
-
-  text-align: center;
-}
-
-.article-footer h2 {
-  margin-bottom: 1.5rem;
-
-  font-size: clamp(
-    2rem,
-    5vw,
-    3rem
-  );
-
-  letter-spacing: -0.04em;
-}
-
-.button {
-  display: inline-block;
-
-  padding: 0.9rem 1.3rem;
-
-  border-radius: 999px;
-
-  background: #111;
-
-  color: #fff;
-
-  font-weight: 700;
-
-  text-decoration: none;
-}
-
-
-/* Mobile */
-
-@media (max-width: 700px) {
-
   .article-page {
-    padding-bottom: 3rem;
+    padding: 48px 0 80px;
+  }
+
+  .container {
+    width: min(1180px, calc(100% - 40px));
+    margin: 0 auto;
   }
 
   .breadcrumbs {
-    margin-bottom: 2rem;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 42px;
+    color: #777;
+    font-size: 14px;
+  }
+
+  .breadcrumbs a {
+    color: #555;
+    text-decoration: none;
+  }
+
+  .breadcrumbs a:hover {
+    color: #111;
+  }
+
+  .article-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 300px;
+    gap: 60px;
+    align-items: start;
+  }
+
+  .article-header {
+    max-width: 900px;
+  }
+
+  .article-category {
+    display: inline-block;
+    margin-bottom: 18px;
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+
+  h1 {
+    margin: 0;
+    max-width: 900px;
+    font-size: clamp(38px, 5vw, 64px);
+    line-height: 1.08;
+    letter-spacing: -0.04em;
+  }
+
+  .article-description {
+    max-width: 780px;
+    margin: 24px 0 20px;
+    color: #666;
+    font-size: 20px;
+    line-height: 1.65;
+  }
+
+  .article-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+    color: #777;
+    font-size: 14px;
   }
 
   .hero-image {
-    aspect-ratio: 4 / 3;
+    margin: 42px 0;
+  }
 
+  .hero-image img {
+    display: block;
+    width: 100%;
+    height: auto;
     border-radius: 18px;
-
-    margin-bottom: 3rem;
   }
 
   .article-content {
-    font-size: 1rem;
+    max-width: 820px;
+    font-size: 18px;
+    line-height: 1.8;
   }
 
-  .destination-grid {
-    grid-template-columns: 1fr;
+  .article-content :global(h2) {
+    margin-top: 52px;
+    margin-bottom: 18px;
+    font-size: 32px;
+    line-height: 1.2;
+    letter-spacing: -0.025em;
+  }
+
+  .article-content :global(h3) {
+    margin-top: 34px;
+    margin-bottom: 12px;
+    font-size: 24px;
+    line-height: 1.3;
+  }
+
+  .article-content :global(p) {
+    margin: 0 0 20px;
+  }
+
+  .article-content :global(ul),
+  .article-content :global(ol) {
+    margin: 0 0 24px;
+    padding-left: 28px;
+  }
+
+  .article-content :global(li) {
+    margin-bottom: 8px;
+  }
+
+  .article-content :global(a) {
+    color: #111;
+    font-weight: 600;
+  }
+
+  .article-content :global(strong) {
+    font-weight: 700;
+  }
+
+  .sidebar {
+    position: sticky;
+    top: 30px;
+  }
+
+  .sidebar-box {
+    padding: 24px;
+    margin-bottom: 20px;
+    border: 1px solid #e5e5e5;
+    border-radius: 16px;
+    background: #fafafa;
+  }
+
+  .sidebar-box h2 {
+    margin: 0 0 12px;
+    font-size: 20px;
+  }
+
+  .sidebar-box p {
+    margin: 0 0 20px;
+    color: #666;
+    line-height: 1.6;
+  }
+
+  .sidebar-box ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .sidebar-box li {
+    border-bottom: 1px solid #e5e5e5;
+  }
+
+  .sidebar-box li:last-child {
+    border-bottom: 0;
+  }
+
+  .sidebar-box li a {
+    display: block;
+    padding: 12px 0;
+    color: #222;
+    text-decoration: none;
+  }
+
+  .sidebar-button {
+    display: inline-block;
+    padding: 11px 16px;
+    border-radius: 8px;
+    background: #111;
+    color: white;
+    text-decoration: none;
+    font-weight: 600;
+  }
+
+  .related-section {
+    margin-top: 90px;
+    padding-top: 60px;
+    border-top: 1px solid #e5e5e5;
+  }
+
+  .section-heading span {
+    display: block;
+    margin-bottom: 8px;
+    color: #777;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+
+  .section-heading h2 {
+    margin: 0 0 30px;
+    font-size: 36px;
+    letter-spacing: -0.03em;
   }
 
   .related-grid {
-    grid-template-columns: 1fr;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
   }
 
-  .related-image {
-    height: 220px;
+  .related-card {
+    overflow: hidden;
+    border: 1px solid #e5e5e5;
+    border-radius: 16px;
+    background: white;
+    color: inherit;
+    text-decoration: none;
+    transition:
+      transform 0.2s ease,
+      box-shadow 0.2s ease;
   }
 
-  .article-footer {
-    margin-top: 3rem;
-
-    padding: 3rem 1.5rem;
+  .related-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.08);
   }
 
-}
+  .related-card img {
+    display: block;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+  }
 
+  .related-card-content {
+    padding: 20px;
+  }
+
+  .related-category {
+    color: #777;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+
+  .related-card h3 {
+    margin: 10px 0;
+    font-size: 21px;
+    line-height: 1.3;
+  }
+
+  .related-card p {
+    margin: 0 0 18px;
+    color: #666;
+    font-size: 14px;
+    line-height: 1.6;
+  }
+
+  .read-more {
+    font-size: 14px;
+    font-weight: 700;
+  }
+
+  .final-cta {
+    margin-top: 90px;
+    padding: 70px 30px;
+    border-radius: 20px;
+    background: #111;
+    color: white;
+    text-align: center;
+  }
+
+  .final-cta span {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+  }
+
+  .final-cta h2 {
+    margin: 14px 0;
+    font-size: 42px;
+    letter-spacing: -0.03em;
+  }
+
+  .final-cta p {
+    max-width: 600px;
+    margin: 0 auto 26px;
+    color: #ccc;
+    line-height: 1.7;
+  }
+
+  .final-cta a {
+    display: inline-block;
+    padding: 13px 20px;
+    border-radius: 8px;
+    background: white;
+    color: #111;
+    text-decoration: none;
+    font-weight: 700;
+  }
+
+  @media (max-width: 900px) {
+    .article-layout {
+      grid-template-columns: 1fr;
+      gap: 40px;
+    }
+
+    .sidebar {
+      position: static;
+    }
+
+    .related-grid {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  @media (max-width: 600px) {
+    .article-page {
+      padding-top: 30px;
+    }
+
+    .container {
+      width: min(100% - 28px, 1180px);
+    }
+
+    .breadcrumbs {
+      margin-bottom: 28px;
+      font-size: 12px;
+    }
+
+    h1 {
+      font-size: 38px;
+    }
+
+    .article-description {
+      font-size: 17px;
+    }
+
+    .article-content {
+      font-size: 17px;
+    }
+
+    .article-content :global(h2) {
+      font-size: 28px;
+    }
+
+    .related-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .final-cta {
+      padding: 50px 22px;
+    }
+
+    .final-cta h2 {
+      font-size: 34px;
+    }
+  }
 </style>

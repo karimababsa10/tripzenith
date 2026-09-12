@@ -1,0 +1,357 @@
+---
+import { getCollection } from "astro:content";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+
+const articles = await getCollection("articles");
+
+const slugify = (value) =>
+  value
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+
+const regions = {};
+
+for (const article of articles) {
+  const { region, country, destination } = article.data;
+
+  if (!regions[region]) {
+    regions[region] = {};
+  }
+
+  if (!regions[region][country]) {
+    regions[region][country] = new Set();
+  }
+
+  regions[region][country].add(destination);
+}
+
+const sortedRegions = Object.entries(regions).sort(([a], [b]) =>
+  a.localeCompare(b)
+);
+---
+
+<BaseLayout
+  title="Travel Destinations"
+  description="Explore travel destinations around the world with TripZenith travel guides, things to do, and practical travel tips."
+>
+  <section class="hero">
+    <p class="eyebrow">TRIPZENITH DESTINATIONS</p>
+
+    <h1>Explore Destinations.</h1>
+
+    <p class="intro">
+      Discover cities, countries, and regions around the world with
+      practical travel guides and inspiring things to do.
+    </p>
+  </section>
+
+  <section class="destinations-section">
+    {sortedRegions.map(([region, countries]) => (
+      <div class="region-block">
+        <div class="region-heading">
+          <div>
+            <p class="section-label">REGION</p>
+
+            <h2>
+              <a href={`/destinations/${slugify(region)}/`}>
+                {region}
+              </a>
+            </h2>
+          </div>
+
+          <a
+            href={`/destinations/${slugify(region)}/`}
+            class="region-link"
+          >
+            Explore region →
+          </a>
+        </div>
+
+        <div class="countries-grid">
+          {Object.entries(countries)
+            .sort(([a], [b]) => a.localeCompare(b))
+            .map(([country, destinations]) => (
+              <div class="country-card">
+                <div class="country-top">
+                  <p class="country-label">COUNTRY</p>
+
+                  <a
+                    href={`/destinations/${slugify(country)}/`}
+                    class="country-link"
+                  >
+                    View country →
+                  </a>
+                </div>
+
+                <h3>
+                  <a href={`/destinations/${slugify(country)}/`}>
+                    {country}
+                  </a>
+                </h3>
+
+                <div class="cities">
+                  {[...destinations]
+                    .sort((a, b) => a.localeCompare(b))
+                    .map((destination) => (
+                      <a
+                        href={`/destinations/${slugify(country)}/${slugify(destination)}/`}
+                        class="city-link"
+                      >
+                        {destination}
+                        <span>→</span>
+                      </a>
+                    ))}
+                </div>
+              </div>
+            ))}
+        </div>
+      </div>
+    ))}
+  </section>
+
+  <section class="bottom-cta">
+    <p class="section-label">TRAVEL WITH TRIPZENITH</p>
+
+    <h2>Find your next destination.</h2>
+
+    <p>
+      Explore our travel guides and discover places worth adding to
+      your next trip.
+    </p>
+
+    <a href="/blog/" class="cta-button">
+      Explore travel guides
+    </a>
+  </section>
+</BaseLayout>
+
+<style>
+.hero {
+  max-width: 850px;
+  margin: 2rem auto 6rem;
+  text-align: center;
+}
+
+.eyebrow {
+  margin-bottom: 1rem;
+  color: #777;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+}
+
+.hero h1 {
+  margin-bottom: 1.3rem;
+  font-size: clamp(3.2rem, 8vw, 6rem);
+  line-height: 0.95;
+  letter-spacing: -0.06em;
+}
+
+.intro {
+  max-width: 650px;
+  margin: 0 auto;
+  color: #666;
+  font-size: 1.15rem;
+  line-height: 1.7;
+}
+
+.destinations-section {
+  margin-bottom: 7rem;
+}
+
+.region-block {
+  margin-bottom: 5rem;
+}
+
+.region-heading {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 2rem;
+  margin-bottom: 2rem;
+  padding-bottom: 1.2rem;
+  border-bottom: 1px solid #e8e8e5;
+}
+
+.section-label {
+  margin-bottom: 0.5rem;
+  color: #888;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+}
+
+.region-heading h2 {
+  margin: 0;
+  font-size: 2.5rem;
+  letter-spacing: -0.045em;
+}
+
+.region-heading h2 a {
+  color: #111;
+  text-decoration: none;
+}
+
+.region-link {
+  color: #111;
+  font-size: 0.9rem;
+  font-weight: 700;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.countries-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem;
+}
+
+.country-card {
+  padding: 2rem;
+  border: 1px solid #e8e8e5;
+  border-radius: 20px;
+  background: #fff;
+  transition:
+    transform 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+.country-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.06);
+}
+
+.country-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.country-label {
+  margin: 0;
+  color: #999;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+}
+
+.country-link {
+  color: #777;
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.country-card h3 {
+  margin-bottom: 1.5rem;
+  font-size: 2rem;
+  letter-spacing: -0.04em;
+}
+
+.country-card h3 a {
+  color: #111;
+  text-decoration: none;
+}
+
+.cities {
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+}
+
+.city-link {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 0.7rem;
+  border-bottom: 1px solid #eeeeeb;
+  color: #444;
+  font-size: 0.95rem;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.city-link:last-child {
+  padding-bottom: 0;
+  border-bottom: none;
+}
+
+.city-link span {
+  color: #999;
+  transition: transform 0.2s ease;
+}
+
+.city-link:hover {
+  color: #111;
+}
+
+.city-link:hover span {
+  transform: translateX(4px);
+}
+
+.bottom-cta {
+  max-width: 800px;
+  margin: 0 auto 4rem;
+  padding: 4rem 2rem;
+  border-radius: 24px;
+  background: #f3f3ef;
+  text-align: center;
+}
+
+.bottom-cta h2 {
+  margin-bottom: 1rem;
+  font-size: clamp(2rem, 5vw, 3rem);
+  letter-spacing: -0.045em;
+}
+
+.bottom-cta > p:not(.section-label) {
+  max-width: 550px;
+  margin: 0 auto 2rem;
+  color: #666;
+  line-height: 1.7;
+}
+
+.cta-button {
+  display: inline-block;
+  padding: 0.9rem 1.4rem;
+  border-radius: 999px;
+  background: #111;
+  color: #fff;
+  font-size: 0.9rem;
+  font-weight: 700;
+  text-decoration: none;
+  transition: transform 0.2s ease;
+}
+
+.cta-button:hover {
+  transform: translateY(-2px);
+}
+
+@media (max-width: 700px) {
+  .hero {
+    margin-bottom: 4rem;
+  }
+
+  .region-heading {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 0.8rem;
+  }
+
+  .countries-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .country-card {
+    padding: 1.5rem;
+  }
+
+  .bottom-cta {
+    padding: 3rem 1.5rem;
+  }
+}
+</style>

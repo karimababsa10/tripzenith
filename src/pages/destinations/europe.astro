@@ -1,0 +1,227 @@
+---
+import { getCollection } from "astro:content";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+
+const articles = await getCollection("articles");
+
+const europeArticles = articles
+  .filter((article) => article.data.region === "Europe")
+  .sort(
+    (a, b) =>
+      b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
+  );
+---
+
+<BaseLayout
+  title="Europe Travel Guides"
+  description="Explore Europe with destination guides, things to do, travel tips, and practical travel inspiration."
+>
+
+  <section class="destination-header">
+
+    <p class="eyebrow">
+      TRIPZENITH DESTINATIONS
+    </p>
+
+    <h1>
+      Explore Europe.
+    </h1>
+
+    <p>
+      Discover cities, landmarks, food, culture, and unforgettable
+      experiences across Europe.
+    </p>
+
+  </section>
+
+
+  <section class="articles-section">
+
+    <div class="articles-grid">
+
+      {europeArticles.map((article) => (
+
+        <article class="article-card">
+
+          {article.data.image && (
+            <a href={`/articles/${article.id}/`} class="image-link">
+              <img
+                src={article.data.image}
+                alt={article.data.title}
+                loading="lazy"
+              />
+            </a>
+          )}
+
+          <div class="article-content">
+
+            <p class="date">
+              {article.data.pubDate.toLocaleDateString(
+                "en-US",
+                {
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric"
+                }
+              )}
+            </p>
+
+            <p class="location">
+              {article.data.destination}, {article.data.country}
+            </p>
+
+            <h2>
+              <a href={`/articles/${article.id}/`}>
+                {article.data.title}
+              </a>
+            </h2>
+
+            <p class="description">
+              {article.data.description}
+            </p>
+
+            <a
+              href={`/articles/${article.id}/`}
+              class="read"
+            >
+              Read guide →
+            </a>
+
+          </div>
+
+        </article>
+
+      ))}
+
+    </div>
+
+  </section>
+
+</BaseLayout>
+
+
+<style>
+
+.destination-header {
+  max-width: 800px;
+  margin: 2rem auto 5rem;
+  text-align: center;
+}
+
+.eyebrow {
+  margin-bottom: 1rem;
+  color: #777;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+}
+
+.destination-header h1 {
+  margin-bottom: 1.2rem;
+  font-size: clamp(3rem, 7vw, 5rem);
+  line-height: 0.95;
+  letter-spacing: -0.055em;
+}
+
+.destination-header > p:last-child {
+  max-width: 620px;
+  margin: 0 auto;
+  color: #666;
+  font-size: 1.1rem;
+  line-height: 1.7;
+}
+
+.articles-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 2rem;
+  margin-bottom: 5rem;
+}
+
+.article-card {
+  overflow: hidden;
+  border: 1px solid #e8e8e5;
+  border-radius: 20px;
+  background: #fff;
+  transition:
+    transform 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+.article-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.07);
+}
+
+.image-link {
+  display: block;
+  height: 260px;
+  overflow: hidden;
+}
+
+.image-link img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+.article-card:hover .image-link img {
+  transform: scale(1.03);
+}
+
+.article-content {
+  padding: 2rem;
+}
+
+.date {
+  margin-bottom: 0.3rem;
+  color: #888;
+  font-size: 0.78rem;
+}
+
+.location {
+  margin-bottom: 0.7rem;
+  color: #777;
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.article-content h2 {
+  margin-bottom: 1rem;
+  font-size: 1.5rem;
+  line-height: 1.15;
+  letter-spacing: -0.03em;
+}
+
+.article-content h2 a {
+  color: #111;
+  text-decoration: none;
+}
+
+.description {
+  margin-bottom: 1.3rem;
+  color: #666;
+  line-height: 1.7;
+}
+
+.read {
+  color: #111;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+@media (max-width: 700px) {
+
+  .articles-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .destination-header {
+    margin-bottom: 3rem;
+  }
+
+}
+
+</style>

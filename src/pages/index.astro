@@ -1,0 +1,553 @@
+```astro
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+const articles = await getCollection('articles');
+
+const sortedArticles = articles.sort(
+  (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
+);
+
+const featuredArticle = sortedArticles[0];
+const latestArticles = sortedArticles.slice(1);
+---
+
+<BaseLayout
+  title="Wayvella — Travel Guides, Destinations & Inspiration"
+  description="Discover inspiring destinations, practical travel guides, itineraries, and travel tips to help you plan your next adventure."
+>
+
+  <main>
+
+    <!-- HERO -->
+    <section class="hero">
+
+      <div class="hero-overlay"></div>
+
+      <div class="hero-content">
+
+        <p class="eyebrow">
+          WAYVELLA TRAVEL
+        </p>
+
+        <h1>
+          Discover places<br />
+          worth traveling to.
+        </h1>
+
+        <p class="hero-description">
+          Travel guides, destination inspiration,
+          and practical ideas for your next adventure.
+        </p>
+
+        <a href="/blog/" class="button">
+          Explore the blog
+          <span>→</span>
+        </a>
+
+      </div>
+
+    </section>
+
+
+    <!-- FEATURED -->
+    {featuredArticle && (
+
+      <section class="section">
+
+        <div class="section-header">
+
+          <div>
+            <p class="label">FEATURED</p>
+            <h2>Start exploring</h2>
+          </div>
+
+          <a href="/blog/" class="all-link">
+            View all →
+          </a>
+
+        </div>
+
+
+        <a
+          href={`/articles/${featuredArticle.id}/`}
+          class="featured"
+        >
+
+          {featuredArticle.data.image && (
+            <img
+              src={featuredArticle.data.image}
+              alt={featuredArticle.data.title}
+            />
+          )}
+
+          <div class="featured-info">
+
+            <p class="date">
+              {featuredArticle.data.pubDate.toLocaleDateString(
+                'en-US',
+                {
+                  year: 'numeric',
+                  month: 'long',
+                  day: 'numeric'
+                }
+              )}
+            </p>
+
+            <h3>
+              {featuredArticle.data.title}
+            </h3>
+
+            <p class="description">
+              {featuredArticle.data.description}
+            </p>
+
+            <span class="read">
+              Read guide →
+            </span>
+
+          </div>
+
+        </a>
+
+      </section>
+
+    )}
+
+
+    <!-- LATEST ARTICLES -->
+    {latestArticles.length > 0 && (
+
+      <section class="section">
+
+        <div class="section-header">
+
+          <div>
+            <p class="label">LATEST ARTICLES</p>
+            <h2>More inspiration</h2>
+          </div>
+
+        </div>
+
+
+        <div class="articles">
+
+          {latestArticles.map((article) => (
+
+            <a
+              href={`/articles/${article.id}/`}
+              class="card"
+            >
+
+              {article.data.image && (
+
+                <div class="card-image">
+
+                  <img
+                    src={article.data.image}
+                    alt={article.data.title}
+                    loading="lazy"
+                  />
+
+                </div>
+
+              )}
+
+
+              <div class="card-info">
+
+                <p class="date">
+                  {article.data.pubDate.toLocaleDateString(
+                    'en-US',
+                    {
+                      year: 'numeric',
+                      month: 'long',
+                      day: 'numeric'
+                    }
+                  )}
+                </p>
+
+                <h3>
+                  {article.data.title}
+                </h3>
+
+                <p class="description">
+                  {article.data.description}
+                </p>
+
+                <span class="read">
+                  Read article →
+                </span>
+
+              </div>
+
+            </a>
+
+          ))}
+
+        </div>
+
+      </section>
+
+    )}
+
+
+    <!-- CTA -->
+    <section class="cta">
+
+      <p class="label">
+        WAYVELLA
+      </p>
+
+      <h2>
+        Your next journey starts here.
+      </h2>
+
+      <p>
+        Explore destinations, discover new places,
+        and find inspiration for your next trip.
+      </p>
+
+      <a href="/blog/" class="button dark">
+        Explore destinations →
+      </a>
+
+    </section>
+
+  </main>
+
+</BaseLayout>
+
+
+<style>
+
+  /* GENERAL */
+
+  main {
+    width: 100%;
+  }
+
+
+  /* HERO */
+
+  .hero {
+    position: relative;
+    min-height: 600px;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+    border-radius: 24px;
+    margin-bottom: 6rem;
+
+    background-image: url('/images/articles/Eiffel_Tower_view_in_Paris_20260912013117.jpeg');
+    background-size: cover;
+    background-position: center;
+  }
+
+  .hero-overlay {
+    position: absolute;
+    inset: 0;
+
+    background: linear-gradient(
+      90deg,
+      rgba(0, 0, 0, 0.65),
+      rgba(0, 0, 0, 0.25),
+      rgba(0, 0, 0, 0.05)
+    );
+  }
+
+  .hero-content {
+    position: relative;
+    z-index: 1;
+    max-width: 650px;
+    padding: 4rem;
+    color: white;
+  }
+
+  .eyebrow,
+  .label {
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+  }
+
+  .eyebrow {
+    margin-bottom: 1.2rem;
+    opacity: 0.85;
+  }
+
+  .hero h1 {
+    margin: 0 0 1.5rem;
+    font-size: clamp(3rem, 7vw, 5.5rem);
+    line-height: 1;
+    letter-spacing: -0.05em;
+  }
+
+  .hero-description {
+    max-width: 500px;
+    margin-bottom: 2rem;
+    font-size: 1.1rem;
+    line-height: 1.7;
+    color: rgba(255, 255, 255, 0.9);
+  }
+
+
+  /* BUTTON */
+
+  .button {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.7rem;
+
+    padding: 0.9rem 1.3rem;
+
+    border-radius: 999px;
+
+    background: white;
+    color: #111;
+
+    text-decoration: none;
+    font-weight: 700;
+
+    transition: transform 0.2s ease;
+  }
+
+  .button:hover {
+    transform: translateY(-2px);
+  }
+
+  .button.dark {
+    background: #111;
+    color: white;
+  }
+
+
+  /* SECTIONS */
+
+  .section {
+    margin-bottom: 6rem;
+  }
+
+  .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: end;
+    margin-bottom: 2rem;
+  }
+
+  .label {
+    margin: 0 0 0.7rem;
+    color: #777;
+  }
+
+  .section h2 {
+    margin: 0;
+    font-size: clamp(2rem, 4vw, 3rem);
+    letter-spacing: -0.04em;
+  }
+
+  .all-link {
+    color: #222;
+    text-decoration: none;
+    font-weight: 600;
+  }
+
+
+  /* FEATURED */
+
+  .featured {
+    display: grid;
+    grid-template-columns: 1.4fr 1fr;
+
+    overflow: hidden;
+
+    border-radius: 24px;
+
+    background: #f3f3ef;
+
+    color: inherit;
+    text-decoration: none;
+
+    transition: transform 0.25s ease;
+  }
+
+  .featured:hover {
+    transform: translateY(-4px);
+  }
+
+  .featured img {
+    width: 100%;
+    height: 430px;
+    object-fit: cover;
+    display: block;
+  }
+
+  .featured-info {
+    padding: 3rem;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .featured-info h3 {
+    margin: 0 0 1rem;
+
+    font-size: clamp(1.8rem, 3vw, 2.6rem);
+    line-height: 1.1;
+    letter-spacing: -0.04em;
+  }
+
+
+  /* ARTICLES */
+
+  .articles {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 2rem;
+  }
+
+  .card {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .card-image {
+    overflow: hidden;
+    border-radius: 20px;
+    margin-bottom: 1.2rem;
+  }
+
+  .card-image img {
+    width: 100%;
+    height: 280px;
+    object-fit: cover;
+    display: block;
+
+    transition: transform 0.4s ease;
+  }
+
+  .card:hover img {
+    transform: scale(1.04);
+  }
+
+  .card-info {
+    padding: 0 0.2rem;
+  }
+
+  .card h3 {
+    margin: 0 0 0.7rem;
+
+    font-size: 1.45rem;
+    line-height: 1.2;
+  }
+
+
+  /* TEXT */
+
+  .date {
+    margin: 0 0 0.6rem;
+
+    color: #888;
+    font-size: 0.8rem;
+  }
+
+  .description {
+    color: #666;
+    line-height: 1.7;
+  }
+
+  .read {
+    color: #222;
+    font-weight: 700;
+  }
+
+
+  /* CTA */
+
+  .cta {
+    margin-bottom: 2rem;
+    padding: 6rem 2rem;
+
+    border-radius: 24px;
+
+    background: #f3f3ef;
+
+    text-align: center;
+  }
+
+  .cta h2 {
+    max-width: 700px;
+    margin: 0 auto 1rem;
+
+    font-size: clamp(2.5rem, 5vw, 4rem);
+    line-height: 1;
+    letter-spacing: -0.05em;
+  }
+
+  .cta p:not(.label) {
+    max-width: 550px;
+    margin: 0 auto 2rem;
+
+    color: #666;
+    line-height: 1.7;
+  }
+
+
+  /* MOBILE */
+
+  @media (max-width: 700px) {
+
+    .hero {
+      min-height: 550px;
+      border-radius: 18px;
+      margin-bottom: 4rem;
+    }
+
+    .hero-content {
+      padding: 2rem;
+    }
+
+    .hero h1 {
+      font-size: 3.2rem;
+    }
+
+    .section {
+      margin-bottom: 4rem;
+    }
+
+    .section-header {
+      align-items: flex-start;
+      flex-direction: column;
+      gap: 0.8rem;
+    }
+
+    .featured {
+      grid-template-columns: 1fr;
+    }
+
+    .featured img {
+      height: 280px;
+    }
+
+    .featured-info {
+      padding: 2rem;
+    }
+
+    .articles {
+      grid-template-columns: 1fr;
+    }
+
+    .card-image img {
+      height: 240px;
+    }
+
+    .cta {
+      padding: 4rem 1.5rem;
+    }
+
+  }
+
+</style>
+```

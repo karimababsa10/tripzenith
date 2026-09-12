@@ -1,0 +1,900 @@
+---
+import { getCollection, render } from "astro:content";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+
+export async function getStaticPaths() {
+  const articles = await getCollection("articles");
+
+  return articles.map((article) => ({
+    params: {
+      slug: article.id,
+    },
+    props: {
+      article,
+    },
+  }));
+}
+
+const { article } = Astro.props;
+const { Content } = await render(article);
+
+const allArticles = await getCollection("articles");
+
+const slugify = (value) =>
+  value
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+
+/* Destination URLs */
+
+const regionSlug = slugify(article.data.region);
+const countrySlug = slugify(article.data.country);
+const citySlug = slugify(article.data.destination);
+
+const regionURL = `/destinations/${regionSlug}/`;
+const countryURL = `/destinations/${countrySlug}/`;
+const cityURL = `/destinations/${countrySlug}/${citySlug}/`;
+
+const canonicalURL = new URL(
+  `/articles/${article.id}/`,
+  "https://tripzenith.com"
+);
+
+/* Related Articles */
+
+const relatedArticles = allArticles
+  .filter((item) => item.id !== article.id)
+  .sort((a, b) => {
+    const score = (item) => {
+      let points = 0;
+
+      if (
+        item.data.destination === article.data.destination
+      ) {
+        points += 3;
+      }
+
+      if (
+        item.data.country === article.data.country
+      ) {
+        points += 2;
+      }
+
+      if (
+        item.data.region === article.data.region
+      ) {
+        points += 1;
+      }
+
+      return points;
+    };
+
+    return score(b) - score(a);
+  })
+  .slice(0, 3);
+
+/* Article Schema */
+
+const schema = {
+  "@context": "https://schema.org",
+  "@type": "Article",
+  headline: article.data.title,
+  description: article.data.description,
+  datePublished: article.data.pubDate.toISOString(),
+  dateModified: article.data.pubDate.toISOString(),
+
+  author: {
+    "@type": "Organization",
+    name: "TripZenith",
+  },
+
+  publisher: {
+    "@type": "Organization",
+    name: "TripZenith",
+  },
+
+  mainEntityOfPage: {
+    "@type": "WebPage",
+    "@id": canonicalURL.toString(),
+  },
+
+  ...(article.data.image
+    ? {
+        image: new URL(
+          article.data.image,
+          "https://tripzenith.com"
+        ).toString(),
+      }
+    : {}),
+};
+
+/* Breadcrumb Schema */
+
+const breadcrumbSchema = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+
+  itemListElement: [
+    {
+      "@type": "ListItem",
+      position: 1,
+      name: "Home",
+      item: "https://tripzenith.com/",
+    },
+
+    {
+      "@type": "ListItem",
+      position: 2,
+      name: article.data.region,
+      item: `https://tripzenith.com${regionURL}`,
+    },
+
+    {
+      "@type": "ListItem",
+      position: 3,
+      name: article.data.country,
+      item: `https://tripzenith.com${countryURL}`,
+    },
+
+    {
+      "@type": "ListItem",
+      position: 4,
+      name: article.data.destination,
+      item: `https://tripzenith.com${cityURL}`,
+    },
+
+    {
+      "@type": "ListItem",
+      position: 5,
+      name: article.data.title,
+      item: canonicalURL.toString(),
+    },
+  ],
+};
+---
+
+<BaseLayout
+  title={article.data.title}
+  description={article.data.description}
+>
+  <article class="article-page">
+
+    <!-- Breadcrumbs -->
+
+    <nav
+      class="breadcrumbs"
+      aria-label="Breadcrumb"
+    >
+      <a href="/">Home</a>
+
+      <span>›</span>
+
+      <a href={regionURL}>
+        {article.data.region}
+      </a>
+
+      <span>›</span>
+
+      <a href={countryURL}>
+        {article.data.country}
+      </a>
+
+      <span>›</span>
+
+      <a href={cityURL}>
+        {article.data.destination}
+      </a>
+
+      <span>›</span>
+
+      <span class="current">
+        {article.data.title}
+      </span>
+    </nav>
+
+
+    <!-- Article Header -->
+
+    <header class="article-header">
+
+      <p class="eyebrow">
+        TRIPZENITH TRAVEL GUIDE
+      </p>
+
+      <h1>
+        {article.data.title}
+      </h1>
+
+      <p class="description">
+        {article.data.description}
+      </p>
+
+      <div class="meta">
+
+        <span>
+          {article.data.pubDate.toLocaleDateString(
+            "en-US",
+            {
+              year: "numeric",
+              month: "long",
+              day: "numeric",
+            }
+          )}
+        </span>
+
+        <span>•</span>
+
+        <span>
+          TripZenith
+        </span>
+
+      </div>
+
+    </header>
+
+
+    <!-- Hero Image -->
+
+    {article.data.image && (
+      <div class="hero-image">
+
+        <img
+          src={article.data.image}
+          alt={article.data.title}
+          loading="eager"
+          fetchpriority="high"
+          decoding="async"
+          sizes="(max-width: 700px) 100vw, 900px"
+        />
+
+      </div>
+    )}
+
+
+    <!-- Article Content -->
+
+    <div class="article-content">
+
+      <Content />
+
+    </div>
+
+
+    <!-- Destination Links -->
+
+    <section class="destination-links">
+
+      <p class="section-label">
+        EXPLORE MORE
+      </p>
+
+      <div class="destination-grid">
+
+        <a
+          href={regionURL}
+          class="destination-card"
+        >
+          <span>Region</span>
+
+          <strong>
+            {article.data.region}
+          </strong>
+        </a>
+
+
+        <a
+          href={countryURL}
+          class="destination-card"
+        >
+          <span>Country</span>
+
+          <strong>
+            {article.data.country}
+          </strong>
+        </a>
+
+
+        <a
+          href={cityURL}
+          class="destination-card"
+        >
+          <span>City</span>
+
+          <strong>
+            {article.data.destination}
+          </strong>
+        </a>
+
+      </div>
+
+    </section>
+
+
+    <!-- Related Articles -->
+
+    {relatedArticles.length > 0 && (
+
+      <section class="related-section">
+
+        <p class="section-label">
+          KEEP EXPLORING
+        </p>
+
+        <h2>
+          More travel guides
+        </h2>
+
+        <div class="related-grid">
+
+          {relatedArticles.map((related) => (
+
+            <article class="related-card">
+
+              {related.data.image && (
+
+                <a
+                  href={`/articles/${related.id}/`}
+                  class="related-image"
+                >
+
+                  <img
+                    src={related.data.image}
+                    alt={related.data.title}
+                    loading="lazy"
+                    decoding="async"
+                    sizes="(max-width: 700px) 100vw, 300px"
+                  />
+
+                </a>
+
+              )}
+
+
+              <div class="related-content">
+
+                <p class="related-location">
+                  {related.data.destination},{" "}
+                  {related.data.country}
+                </p>
+
+
+                <h3>
+
+                  <a
+                    href={`/articles/${related.id}/`}
+                  >
+                    {related.data.title}
+                  </a>
+
+                </h3>
+
+
+                <p class="related-description">
+                  {related.data.description}
+                </p>
+
+
+                <a
+                  href={`/articles/${related.id}/`}
+                  class="read"
+                >
+                  Read guide →
+                </a>
+
+              </div>
+
+            </article>
+
+          ))}
+
+        </div>
+
+      </section>
+
+    )}
+
+
+    <!-- Final CTA -->
+
+    <section class="article-footer">
+
+      <p class="eyebrow">
+        KEEP EXPLORING
+      </p>
+
+      <h2>
+        Discover your next destination.
+      </h2>
+
+      <a
+        href="/blog/"
+        class="button"
+      >
+        Explore the travel blog →
+      </a>
+
+    </section>
+
+  </article>
+
+
+  <!-- Article Schema -->
+
+  <script
+    type="application/ld+json"
+    set:html={JSON.stringify(schema)}
+  />
+
+
+  <!-- Breadcrumb Schema -->
+
+  <script
+    type="application/ld+json"
+    set:html={JSON.stringify(breadcrumbSchema)}
+  />
+
+</BaseLayout>
+
+
+<style>
+
+.article-page {
+  max-width: 900px;
+  margin: 0 auto;
+  padding-bottom: 5rem;
+}
+
+
+/* Breadcrumbs */
+
+.breadcrumbs {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+
+  margin-bottom: 3rem;
+
+  color: #777;
+  font-size: 0.8rem;
+}
+
+.breadcrumbs a {
+  color: #555;
+  text-decoration: none;
+}
+
+.breadcrumbs a:hover {
+  color: #111;
+}
+
+.breadcrumbs .current {
+  max-width: 280px;
+
+  overflow: hidden;
+
+  text-overflow: ellipsis;
+
+  white-space: nowrap;
+}
+
+
+/* Article Header */
+
+.article-header {
+  max-width: 800px;
+  margin-bottom: 3rem;
+}
+
+.eyebrow {
+  margin-bottom: 1rem;
+
+  color: #777;
+
+  font-size: 0.72rem;
+
+  font-weight: 700;
+
+  letter-spacing: 0.16em;
+}
+
+.article-header h1 {
+  margin-bottom: 1.5rem;
+
+  color: #111;
+
+  font-size: clamp(
+    2.7rem,
+    6vw,
+    5rem
+  );
+
+  line-height: 1;
+
+  letter-spacing: -0.055em;
+}
+
+.description {
+  margin-bottom: 1.5rem;
+
+  color: #666;
+
+  font-size: 1.15rem;
+
+  line-height: 1.7;
+}
+
+.meta {
+  display: flex;
+
+  gap: 0.6rem;
+
+  color: #888;
+
+  font-size: 0.82rem;
+}
+
+
+/* Hero */
+
+.hero-image {
+  width: 100%;
+
+  aspect-ratio: 16 / 9;
+
+  margin-bottom: 4rem;
+
+  overflow: hidden;
+
+  border-radius: 24px;
+}
+
+.hero-image img {
+  width: 100%;
+
+  height: 100%;
+
+  display: block;
+
+  object-fit: cover;
+}
+
+
+/* Article Content */
+
+.article-content {
+  max-width: 760px;
+
+  margin: 0 auto;
+
+  color: #333;
+
+  font-size: 1.05rem;
+
+  line-height: 1.85;
+}
+
+.article-content :global(h2) {
+  margin-top: 3rem;
+
+  margin-bottom: 1rem;
+
+  color: #111;
+
+  font-size: 2rem;
+
+  line-height: 1.2;
+
+  letter-spacing: -0.03em;
+}
+
+.article-content :global(h3) {
+  margin-top: 2rem;
+
+  margin-bottom: 0.8rem;
+
+  color: #111;
+
+  font-size: 1.4rem;
+}
+
+.article-content :global(p) {
+  margin-bottom: 1.4rem;
+}
+
+.article-content :global(ul),
+.article-content :global(ol) {
+  margin-bottom: 1.5rem;
+
+  padding-left: 1.5rem;
+}
+
+.article-content :global(li) {
+  margin-bottom: 0.5rem;
+}
+
+.article-content :global(a) {
+  color: #111;
+
+  font-weight: 600;
+}
+
+
+/* Destination Links */
+
+.destination-links {
+  margin-top: 5rem;
+
+  padding-top: 3rem;
+
+  border-top: 1px solid #e8e8e5;
+}
+
+.section-label {
+  margin-bottom: 1rem;
+
+  color: #777;
+
+  font-size: 0.72rem;
+
+  font-weight: 700;
+
+  letter-spacing: 0.16em;
+}
+
+.destination-grid {
+  display: grid;
+
+  grid-template-columns:
+    repeat(3, 1fr);
+
+  gap: 1rem;
+}
+
+.destination-card {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 0.4rem;
+
+  padding: 1.5rem;
+
+  border: 1px solid #e8e8e5;
+
+  border-radius: 16px;
+
+  color: #111;
+
+  text-decoration: none;
+
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.destination-card:hover {
+  transform: translateY(-3px);
+
+  box-shadow:
+    0 10px 30px
+    rgba(0, 0, 0, 0.06);
+}
+
+.destination-card span {
+  color: #888;
+
+  font-size: 0.75rem;
+}
+
+.destination-card strong {
+  font-size: 1.05rem;
+}
+
+
+/* Related Articles */
+
+.related-section {
+  margin-top: 5rem;
+
+  padding-top: 3rem;
+
+  border-top: 1px solid #e8e8e5;
+}
+
+.related-section h2 {
+  margin-bottom: 2rem;
+
+  font-size: 2rem;
+
+  letter-spacing: -0.04em;
+}
+
+.related-grid {
+  display: grid;
+
+  grid-template-columns:
+    repeat(3, 1fr);
+
+  gap: 1.2rem;
+}
+
+.related-card {
+  overflow: hidden;
+
+  border: 1px solid #e8e8e5;
+
+  border-radius: 18px;
+
+  background: #fff;
+
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.related-card:hover {
+  transform: translateY(-3px);
+
+  box-shadow:
+    0 10px 30px
+    rgba(0, 0, 0, 0.06);
+}
+
+.related-image {
+  display: block;
+
+  height: 180px;
+
+  overflow: hidden;
+}
+
+.related-image img {
+  width: 100%;
+
+  height: 100%;
+
+  display: block;
+
+  object-fit: cover;
+}
+
+.related-content {
+  padding: 1.3rem;
+}
+
+.related-location {
+  margin-bottom: 0.5rem;
+
+  color: #777;
+
+  font-size: 0.75rem;
+
+  font-weight: 600;
+}
+
+.related-content h3 {
+  margin-bottom: 0.8rem;
+
+  font-size: 1.15rem;
+
+  line-height: 1.25;
+}
+
+.related-content h3 a {
+  color: #111;
+
+  text-decoration: none;
+}
+
+.related-description {
+  margin-bottom: 1rem;
+
+  color: #666;
+
+  font-size: 0.9rem;
+
+  line-height: 1.6;
+}
+
+.read {
+  color: #111;
+
+  font-size: 0.85rem;
+
+  font-weight: 700;
+
+  text-decoration: none;
+}
+
+
+/* Footer CTA */
+
+.article-footer {
+  margin-top: 5rem;
+
+  padding: 4rem 2rem;
+
+  border-radius: 24px;
+
+  background: #f5f5f2;
+
+  text-align: center;
+}
+
+.article-footer h2 {
+  margin-bottom: 1.5rem;
+
+  font-size: clamp(
+    2rem,
+    5vw,
+    3rem
+  );
+
+  letter-spacing: -0.04em;
+}
+
+.button {
+  display: inline-block;
+
+  padding: 0.9rem 1.3rem;
+
+  border-radius: 999px;
+
+  background: #111;
+
+  color: #fff;
+
+  font-weight: 700;
+
+  text-decoration: none;
+}
+
+
+/* Mobile */
+
+@media (max-width: 700px) {
+
+  .article-page {
+    padding-bottom: 3rem;
+  }
+
+  .breadcrumbs {
+    margin-bottom: 2rem;
+  }
+
+  .hero-image {
+    aspect-ratio: 4 / 3;
+
+    border-radius: 18px;
+
+    margin-bottom: 3rem;
+  }
+
+  .article-content {
+    font-size: 1rem;
+  }
+
+  .destination-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .related-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .related-image {
+    height: 220px;
+  }
+
+  .article-footer {
+    margin-top: 3rem;
+
+    padding: 3rem 1.5rem;
+  }
+
+}
+
+</style>

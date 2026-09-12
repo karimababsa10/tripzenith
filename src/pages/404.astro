@@ -1,0 +1,115 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+---
+
+<BaseLayout
+  title="Page Not Found"
+  description="The page you're looking for could not be found on TripZenith."
+>
+  <main class="not-found">
+    <p class="eyebrow">TRIPZENITH</p>
+
+    <h1>404</h1>
+
+    <h2>Looks like you've taken a wrong turn.</h2>
+
+    <p class="description">
+      The page you're looking for doesn't exist or may have moved.
+      Let's get you back on the road.
+    </p>
+
+    <div class="actions">
+      <a href="/" class="primary">
+        Back to homepage
+      </a>
+
+      <a href="/destinations/" class="secondary">
+        Explore destinations →
+      </a>
+    </div>
+  </main>
+</BaseLayout>
+
+<style>
+.not-found {
+  min-height: 65vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 1.5rem;
+  text-align: center;
+}
+
+.eyebrow {
+  margin-bottom: 1rem;
+  color: #777;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+}
+
+.not-found h1 {
+  margin: 0;
+  font-size: clamp(7rem, 20vw, 12rem);
+  line-height: 0.8;
+  letter-spacing: -0.08em;
+  color: #111;
+}
+
+.not-found h2 {
+  margin: 2rem 0 1rem;
+  font-size: clamp(1.7rem, 4vw, 2.5rem);
+  letter-spacing: -0.04em;
+}
+
+.description {
+  max-width: 520px;
+  margin: 0 auto 2rem;
+  color: #666;
+  line-height: 1.7;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.actions a {
+  text-decoration: none;
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.primary {
+  padding: 0.9rem 1.4rem;
+  border-radius: 999px;
+  background: #111;
+  color: #fff;
+  transition: transform 0.2s ease;
+}
+
+.primary:hover {
+  transform: translateY(-2px);
+}
+
+.secondary {
+  padding: 0.9rem 1rem;
+  color: #111;
+}
+
+@media (max-width: 600px) {
+  .actions {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .actions a {
+    width: 100%;
+    text-align: center;
+  }
+}
+</style>

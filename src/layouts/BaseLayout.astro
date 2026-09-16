@@ -1,4 +1,8 @@
 ---
+// BaseLayout.astro - Core layout shell for TripZenith
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+
 const { title, description, image } = Astro.props;
 
 const canonicalURL = new URL(
@@ -39,350 +43,99 @@ const organizationSchema = {
 <!doctype html>
 <html lang="en">
   <head>
+    <!-- Character encoding & Viewport -->
     <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1.0"
-    />
-
+    <!-- SEO Meta Tags -->
     <title>{title} | TripZenith</title>
-
-    <meta
-      name="description"
-      content={description}
-    />
-
-    <meta
-      name="robots"
-      content="index, follow"
-    />
-
-    <link
-      rel="canonical"
-      href={canonicalURL}
-    />
+    <meta name="description" content={description || "Travel guides, destination ideas, and travel tips for exploring the world."} />
+    <meta name="robots" content="index, follow" />
+    <link rel="canonical" href={canonicalURL} />
 
     <!-- Favicon -->
-    <link
-      rel="icon"
-      type="image/svg+xml"
-      href="/favicon.svg"
-    />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 
-    <!-- Open Graph -->
-    <meta
-      property="og:title"
-      content={`${title} | TripZenith`}
-    />
+    <!-- Open Graph Metadata (Facebook / Slack / Discord sharing) -->
+    <meta property="og:title" content={`${title} | TripZenith`} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="TripZenith" />
+    <meta property="og:url" content={canonicalURL} />
+    <meta property="og:image" content={socialImage} />
+    <meta property="og:image:alt" content={title} />
 
-    <meta
-      property="og:description"
-      content={description}
-    />
+    <!-- Twitter Metadata -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={`${title} | TripZenith`} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={socialImage} />
+    <meta name="twitter:image:alt" content={title} />
 
-    <meta
-      property="og:type"
-      content="website"
-    />
+    <!-- Premium Google Fonts: Playfair Display (Serif) & Inter (Sans-serif) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet" />
 
-    <meta
-      property="og:site_name"
-      content="TripZenith"
-    />
+    <!-- Structured Data Schemas for SEO -->
+    <script type="application/ld+json" set:html={JSON.stringify(websiteSchema)} />
+    <script type="application/ld+json" set:html={JSON.stringify(organizationSchema)} />
 
-    <meta
-      property="og:url"
-      content={canonicalURL}
-    />
-
-    <meta
-      property="og:image"
-      content={socialImage}
-    />
-
-    <meta
-      property="og:image:alt"
-      content={title}
-    />
-
-    <!-- Twitter -->
-    <meta
-      name="twitter:card"
-      content="summary_large_image"
-    />
-
-    <meta
-      name="twitter:title"
-      content={`${title} | TripZenith`}
-    />
-
-    <meta
-      name="twitter:description"
-      content={description}
-    />
-
-    <meta
-      name="twitter:image"
-      content={socialImage}
-    />
-
-    <meta
-      name="twitter:image:alt"
-      content={title}
-    />
-
-    <!-- Google Fonts -->
-    <link
-      rel="preconnect"
-      href="https://fonts.googleapis.com"
-    />
-
-    <link
-      rel="preconnect"
-      href="https://fonts.gstatic.com"
-      crossorigin
-    />
-
-    <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
-      rel="stylesheet"
-    />
-
-    <!-- WebSite Schema -->
-    <script
-      type="application/ld+json"
-      set:html={JSON.stringify(websiteSchema)}
-    />
-
-    <!-- Organization Schema -->
-    <script
-      type="application/ld+json"
-      set:html={JSON.stringify(organizationSchema)}
-    />
-
+    <!-- Slot for pages that want to inject code into head -->
     <slot name="head" />
-
-    <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-BN852Z77RL"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'G-BN852Z77RL');
-    </script>
   </head>
 
   <body>
-    <header class="site-header">
-      <div class="container header-inner">
-        <a href="/" class="logo">
-          TripZenith
-        </a>
+    <!-- Premium Extracted Header -->
+    <Header />
 
-        <nav class="main-nav">
-          <a href="/">Home</a>
-          <a href="/blog/">Blog</a>
-          <a href="/destinations/">Destinations</a>
-          <a href="/about/">About</a>
-        </nav>
-      </div>
-    </header>
-
-    <main>
+    <!-- Main Content Slot -->
+    <main class="page-content">
       <slot />
     </main>
 
-    <footer class="site-footer">
-      <div class="container footer-inner">
-        <div>
-          <a href="/" class="footer-logo">
-            TripZenith
-          </a>
-
-          <p>
-            Travel guides, destination ideas, and practical tips
-            for exploring the world.
-          </p>
-        </div>
-
-        <div class="footer-links">
-          <a href="/about/">About</a>
-          <a href="/contact/">Contact</a>
-          <a href="/privacy-policy/">Privacy Policy</a>
-          <a href="/terms/">Terms</a>
-          <a href="/affiliate-disclosure/">Affiliate Disclosure</a>
-        </div>
-      </div>
-
-      <div class="container footer-bottom">
-        <p>
-          © {new Date().getFullYear()} TripZenith. All rights reserved.
-        </p>
-      </div>
-    </footer>
+    <!-- Premium Extracted Footer -->
+    <Footer />
   </body>
 </html>
 
-<style>
-  :global(*) {
+<style is:global>
+  /* Global Modern Editorial Theme Resets & Base Styles */
+  *, *::before, *::after {
     box-sizing: border-box;
+    margin: 0;
+    padding: 0;
   }
 
-  :global(html) {
+  html {
     scroll-behavior: smooth;
+    background-color: #fcfbf9; /* Clean Warm Paper Canvas */
   }
 
-  :global(body) {
-    margin: 0;
-    font-family:
-      "Inter",
-      -apple-system,
-      BlinkMacSystemFont,
-      "Segoe UI",
-      sans-serif;
-    color: #111827;
-    background: #ffffff;
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    color: #1f2937; /* Dark charcoal text for comfortable reading */
+    background-color: #ffffff;
     line-height: 1.7;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 
-  :global(a) {
-    color: inherit;
-    text-decoration: none;
-  }
-
+  /* Utility container for page alignments */
   .container {
-    width: min(1180px, calc(100% - 40px));
+    max-width: 1200px;
     margin: 0 auto;
+    padding: 0 20px;
   }
 
-  .site-header {
-    border-bottom: 1px solid #e5e7eb;
-    background: #ffffff;
+  /* Smooth Focus state style for all interactive elements to preserve accessibility */
+  a:focus-visible, button:focus-visible, input:focus-visible {
+    outline: 2.5px solid #bfa17f;
+    outline-offset: 3px;
   }
 
-  .header-inner {
-    min-height: 76px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 30px;
-  }
-
-  .logo {
-    font-size: 1.45rem;
-    font-weight: 800;
-    letter-spacing: -0.04em;
-    color: #111827;
-  }
-
-  .main-nav {
-    display: flex;
-    align-items: center;
-    gap: 28px;
-  }
-
-  .main-nav a {
-    font-size: 0.95rem;
-    font-weight: 500;
-    color: #4b5563;
-    transition: color 0.2s ease;
-  }
-
-  .main-nav a:hover {
-    color: #111827;
-  }
-
-  .site-footer {
-    margin-top: 100px;
-    border-top: 1px solid #e5e7eb;
-    background: #f9fafb;
-  }
-
-  .footer-inner {
-    padding: 55px 0 40px;
-    display: flex;
-    justify-content: space-between;
-    gap: 60px;
-  }
-
-  .footer-logo {
-    font-size: 1.3rem;
-    font-weight: 800;
-    letter-spacing: -0.03em;
-  }
-
-  .footer-inner p {
-    max-width: 430px;
-    margin: 12px 0 0;
-    color: #6b7280;
-    font-size: 0.95rem;
-  }
-
-  .footer-links {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: flex-start;
-    justify-content: flex-end;
-    gap: 14px 24px;
-    max-width: 500px;
-  }
-
-  .footer-links a {
-    color: #6b7280;
-    font-size: 0.9rem;
-  }
-
-  .footer-links a:hover {
-    color: #111827;
-  }
-
-  .footer-bottom {
-    padding: 20px 0 28px;
-    border-top: 1px solid #e5e7eb;
-  }
-
-  .footer-bottom p {
-    margin: 0;
-    color: #9ca3af;
-    font-size: 0.85rem;
-  }
-
-  @media (max-width: 700px) {
-    .container {
-      width: min(100% - 28px, 1180px);
-    }
-
-    .header-inner {
-      min-height: auto;
-      padding: 18px 0;
-      flex-direction: column;
-      align-items: flex-start;
-      gap: 14px;
-    }
-
-    .main-nav {
-      width: 100%;
-      gap: 18px;
-      flex-wrap: wrap;
-    }
-
-    .main-nav a {
-      font-size: 0.88rem;
-    }
-
-    .footer-inner {
-      padding: 40px 0 30px;
-      flex-direction: column;
-      gap: 30px;
-    }
-
-    .footer-links {
-      justify-content: flex-start;
-    }
-
-    .site-footer {
-      margin-top: 70px;
-    }
+  /* Core transition definitions */
+  a, button {
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   }
 </style>

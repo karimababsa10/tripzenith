@@ -1,0 +1,190 @@
+---
+// Footer.astro - Reusable footer for TripZenith
+const currentYear = new Date().getFullYear();
+---
+
+<footer class="site-footer">
+  <div class="footer-container">
+    
+    <!-- Editorial Brand Info -->
+    <div class="footer-column brand-info">
+      <a href="/" class="brand-logo">
+        Trip<span class="accent-text">Zenith</span>
+      </a>
+      <p class="brand-description">
+        Crafting inspiring travel guides, design-focused itineraries, and curated visual stories for the modern editorial traveler. Exploring the world with elegance and purpose.
+      </p>
+    </div>
+
+    <!-- Navigation Column 1 - Destinations -->
+    <div class="footer-column">
+      <h3 class="footer-heading">Destinations</h3>
+      <ul class="footer-links">
+        <li><a href="/destinations/europe/">Europe</a></li>
+        <li><a href="/destinations/asia/">Asia</a></li>
+        <li><a href="/destinations/americas/">Americas</a></li>
+        <li><a href="/destinations/oceania/">Oceania</a></li>
+      </ul>
+    </div>
+
+    <!-- Navigation Column 2 - Company -->
+    <div class="footer-column">
+      <h3 class="footer-heading">TripZenith</h3>
+      <ul class="footer-links">
+        <li><a href="/about/">Our Story</a></li>
+        <li><a href="/contact/">Get in Touch</a></li>
+        <li><a href="/blog/">Travel Tips</a></li>
+        <li><a href="/affiliate-disclosure/">Disclosure</a></li>
+      </ul>
+    </div>
+
+    <!-- Navigation Column 3 - Legal -->
+    <div class="footer-column">
+      <h3 class="footer-heading">Legal</h3>
+      <ul class="footer-links">
+        <li><a href="/privacy-policy/">Privacy Policy</a></li>
+        <li><a href="/terms/">Terms of Service</a></li>
+      </ul>
+    </div>
+
+  </div>
+
+  <!-- Bottom Bar with copyright -->
+  <div class="footer-bottom">
+    <div class="footer-bottom-container">
+      <p class="copyright-text">
+        &copy; {currentYear} TripZenith. Created with care for modern explorers.
+      </p>
+    </div>
+  </div>
+</footer>
+
+<style>
+  /* Footer Base Styles */
+  .site-footer {
+    background-color: #faf9f6; /* Very warm light beige/paper white */
+    border-top: 1px solid #f0edf0;
+    padding: 80px 0 40px;
+    margin-top: 120px; /* Generous whitespace */
+  }
+
+  .footer-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr;
+    gap: 60px;
+  }
+
+  /* Brand Info Column */
+  .brand-info {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .brand-logo {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #111827;
+    text-decoration: none;
+    letter-spacing: -0.02em;
+  }
+
+  .accent-text {
+    color: #bfa17f; /* Sand-gold brand accent */
+  }
+
+  .brand-description {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.95rem;
+    color: #5c646f;
+    line-height: 1.65;
+    margin: 0;
+    max-width: 320px;
+  }
+
+  /* List Styling and Typographies */
+  .footer-heading {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: 1.15rem;
+    font-weight: 600;
+    color: #111827;
+    margin: 0 0 24px 0;
+  }
+
+  .footer-links {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .footer-links a {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.9rem;
+    color: #5c646f;
+    text-decoration: none;
+    transition: color 0.2s ease, transform 0.2s ease;
+    display: inline-block;
+  }
+
+  .footer-links a:hover {
+    color: #bfa17f;
+    transform: translateX(3px); /* Subtle interactive offset */
+  }
+
+  /* Footer Bottom Bar */
+  .footer-bottom {
+    border-top: 1px solid #f0edf0;
+    margin-top: 60px;
+    padding-top: 30px;
+  }
+
+  .footer-bottom-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+    display: flex;
+    justify-content: center;
+  }
+
+  .copyright-text {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.85rem;
+    color: #9ca3af;
+    margin: 0;
+  }
+
+  /* Responsive Adjustments */
+  @media (max-width: 992px) {
+    .footer-container {
+      grid-template-columns: 1fr 1fr;
+      gap: 40px;
+    }
+    
+    .brand-description {
+      max-width: 100%;
+    }
+  }
+
+  @media (max-width: 576px) {
+    .site-footer {
+      padding: 60px 0 30px;
+      margin-top: 80px;
+    }
+
+    .footer-container {
+      grid-template-columns: 1fr;
+      gap: 30px;
+    }
+
+    .footer-heading {
+      margin-bottom: 16px;
+    }
+  }
+</style>

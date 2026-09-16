@@ -3,7 +3,7 @@
 title: "10 Best Things to Do in London for First-Time Visitors"
 description: "Discover the best things to do in London, from historic landmarks and royal palaces to world-class museums, markets, neighborhoods, and unforgettable experiences."
 pubDate: 2026-09-13
-image: "/images/articles/london.webp"
+image: "/images/articles/london.jpeg"
 category: "Things to Do"
 destination: "London"
 country: "United Kingdom"

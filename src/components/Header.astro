@@ -1,0 +1,153 @@
+---
+// Header.astro - Reusable navigation header for TripZenith
+---
+
+<header class="site-header">
+  <div class="header-container">
+    <!-- Brand Logo -->
+    <a href="/" class="brand-logo">
+      Trip<span class="accent-text">Zenith</span>
+    </a>
+
+    <!-- Simple, JS-free Responsive Navigation -->
+    <nav class="main-navigation">
+      <ul class="nav-links">
+        <li><a href="/" class="nav-link">Home</a></li>
+        <li><a href="/destinations/" class="nav-link">Destinations</a></li>
+        <li><a href="/blog/" class="nav-link">Travel Tips</a></li>
+        <li><a href="/about/" class="nav-link">About</a></li>
+      </ul>
+    </nav>
+
+    <!-- Header Action Button -->
+    <div class="header-actions">
+      <a href="#newsletter" class="subscribe-button">Subscribe</a>
+    </div>
+  </div>
+</header>
+
+<style>
+  /* Base Header Styles */
+  .site-header {
+    background-color: #ffffff;
+    border-bottom: 1px solid #f0edf0;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .header-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+  }
+
+  /* Logo Design */
+  .brand-logo {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: #111827;
+    text-decoration: none;
+    letter-spacing: -0.02em;
+    transition: opacity 0.2s ease;
+  }
+
+  .brand-logo:hover {
+    opacity: 0.85;
+  }
+
+  .accent-text {
+    color: #bfa17f; /* Sand-Gold Premium Accent */
+  }
+
+  /* Navigation Links */
+  .main-navigation {
+    display: flex;
+    align-items: center;
+  }
+
+  .nav-links {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    gap: 32px;
+  }
+
+  .nav-link {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: #4b5563; /* Elegant slate grey */
+    text-decoration: none;
+    transition: color 0.2s ease;
+    padding: 6px 0;
+    position: relative;
+  }
+
+  .nav-link:hover {
+    color: #111827; /* Near black on hover */
+  }
+
+  /* Add a subtle underline transition on hover */
+  .nav-link::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 0;
+    height: 1.5px;
+    background-color: #bfa17f;
+    transition: width 0.2s ease;
+  }
+
+  .nav-link:hover::after {
+    width: 100%;
+  }
+
+  /* Header CTA Button */
+  .subscribe-button {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 600;
+    background-color: #111827;
+    color: #ffffff;
+    text-decoration: none;
+    padding: 10px 20px;
+    border-radius: 4px;
+    transition: background-color 0.2s ease;
+  }
+
+  .subscribe-button:hover {
+    background-color: #bfa17f; /* Smooth hover state transition */
+  }
+
+  /* Responsive Design - Simple Mobile Layout */
+  @media (max-width: 768px) {
+    .header-container {
+      flex-direction: column;
+      padding: 15px;
+      gap: 15px;
+      text-align: center;
+    }
+
+    .nav-links {
+      gap: 16px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .nav-link {
+      font-size: 0.9rem;
+    }
+
+    .header-actions {
+      display: none; /* Hide action button on mobile to keep space clean */
+    }
+  }
+</style>

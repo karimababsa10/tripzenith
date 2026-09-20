@@ -7,6 +7,7 @@ destination: "General"
 country: "General"
 region: "Worldwide"
 tags: ["slow travel", "budget travel", "digital nomad"]
+image: "/images/articles/month-long-stay.jpeg"
 ---
 # How to Plan a Month-Long Stay Anywhere (Without Breaking the Bank)
 

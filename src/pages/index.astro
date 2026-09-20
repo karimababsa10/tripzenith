@@ -1,6 +1,7 @@
 ---
 // index.astro - TripZenith Homepage
 import BaseLayout from '../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
 
 // Featured Destinations Data - Clear and easy to edit
 const featuredDestinations = [
@@ -34,63 +35,20 @@ const featuredDestinations = [
   }
 ];
 
-// Latest Articles Data - Beginner friendly 6-card array
-const latestArticles = [
-  {
-    title: "The Ultimate Guide to Hidden Cafés in Paris",
-    description: "Skip the tourist traps and discover the best-kept culinary secrets tucked away in quiet alleys and leafy courtyards.",
-    image: "https://images.unsplash.com/photo-1502082553048-f009c37129b9?auto=format&fit=crop&w=600&q=80",
-    category: "Culinary",
+// Latest Articles - pulled dynamically from real content, newest first
+const allArticles = await getCollection('articles');
+const latestArticles = allArticles
+  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
+  .slice(0, 6)
+  .map((article) => ({
+    title: article.data.title,
+    description: article.data.description,
+    image: article.data.image || 'https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?auto=format&fit=crop&w=600&q=80',
+    category: article.data.category,
     readTime: "5 Min Read",
-    date: "Sep 12, 2026",
-    link: "/blog/"
-  },
-  {
-    title: "Chasing the Northern Lights in Reykjavik",
-    description: "Everything you need to know about planning your dream winter expedition to Iceland's beautiful geothermal capital.",
-    image: "https://images.unsplash.com/photo-1529963183134-61a90db47eaf?auto=format&fit=crop&w=600&q=80",
-    category: "Adventure",
-    readTime: "7 Min Read",
-    date: "Sep 09, 2026",
-    link: "/blog/"
-  },
-  {
-    title: "A Design-Focused 3 Day Itinerary in Kyoto",
-    description: "Explore traditional bamboo paths, minimal architecture, and timeless wooden temples in Japan's cultural heart.",
-    image: "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?auto=format&fit=crop&w=600&q=80",
-    category: "Itinerary",
-    readTime: "6 Min Read",
-    date: "Sep 05, 2026",
-    link: "/blog/"
-  },
-  {
-    title: "How to Spend an Art-Infused Weekend in London",
-    description: "Navigate London's prestigious galleries, dynamic street art scenes, and private boutique galleries.",
-    image: "https://images.unsplash.com/photo-1526129318478-62ed807ebdf9?auto=format&fit=crop&w=600&q=80",
-    category: "Art & Museum",
-    readTime: "4 Min Read",
-    date: "Aug 29, 2026",
-    link: "/blog/"
-  },
-  {
-    title: "Finding Serenity in Bali's Sacred Retreats",
-    description: "Unwind in the misty rainforests and vibrant terraced rice fields of Ubud's world-renowned holistic centers.",
-    image: "https://images.unsplash.com/photo-1537996194471-e657df975ab4?auto=format&fit=crop&w=600&q=80",
-    category: "Wellness",
-    readTime: "8 Min Read",
-    date: "Aug 22, 2026",
-    link: "/blog/"
-  },
-  {
-    title: "A Slow Traveler's Guide to the Amalfi Coast",
-    description: "Discover a relaxed pace of coastal living, pastel-colored villages, and local lemon orchards.",
-    image: "https://images.unsplash.com/photo-1533105079780-92b9be482077?auto=format&fit=crop&w=600&q=80",
-    category: "Culture",
-    readTime: "5 Min Read",
-    date: "Aug 15, 2026",
-    link: "/blog/"
-  }
-];
+    date: article.data.pubDate.toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' }),
+    link: `/articles/${article.slug}`
+  }));
 ---
 
 <BaseLayout
@@ -234,7 +192,7 @@ const latestArticles = [
     font-size: 0.85rem;
     font-weight: 700;
     letter-spacing: 0.15em;
-    color: #bfa17f; /* Ochre brand color */
+    color: #bfa17f;
     margin-bottom: 24px;
     display: inline-block;
   }
@@ -253,7 +211,7 @@ const latestArticles = [
     font-size: clamp(1rem, 2vw, 1.2rem);
     font-weight: 400;
     line-height: 1.65;
-    color: #f3f4f6; /* Very light slate grey */
+    color: #f3f4f6;
     margin-bottom: 40px;
     max-width: 600px;
     margin-left: auto;
@@ -408,9 +366,8 @@ const latestArticles = [
     z-index: 2;
   }
 
-  /* Card Hover Animations */
   .destination-card:hover .card-image-wrapper img {
-    transform: scale(1.08); /* Sophisticated hover zoom */
+    transform: scale(1.08);
   }
 
   .destination-card-content {
@@ -448,7 +405,6 @@ const latestArticles = [
     transition: opacity 0.3s ease, transform 0.3s ease;
   }
 
-  /* Slide up metadata on hover */
   .destination-card:hover .destination-guide-count {
     opacity: 1;
     transform: translateY(0);
@@ -507,7 +463,7 @@ const latestArticles = [
   }
 
   .article-card-content {
-    padding: 24px 0 0 0; /* Padding-free card edges for neat editorial style */
+    padding: 24px 0 0 0;
     display: flex;
     flex-direction: column;
     flex-grow: 1;
@@ -602,7 +558,7 @@ const latestArticles = [
 
   /* --- NEWSLETTER SIGNUP SECTION --- */
   .newsletter-section {
-    background-color: #faf9f6; /* Warm paper canvas background */
+    background-color: #faf9f6;
     border-top: 1px solid #f0edf0;
     border-bottom: 1px solid #f0edf0;
     padding: 100px 0;

@@ -2,7 +2,7 @@
 title: "10 Best Things to Do in Tokyo for First-Time Visitors"
 description: "Discover the best things to do in Tokyo, from historic temples and vibrant neighborhoods to Japanese food, shopping, and unforgettable experiences."
 pubDate: 2026-09-16
-image: "/images/articles/tokyo.webp"
+image: "/images/articles/tokyo.jpeg"
 category: "Things to Do"
 destination: "Tokyo"
 country: "Japan"

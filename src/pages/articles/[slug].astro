@@ -20,7 +20,7 @@ const { Content } = await render(article);
 
 const allArticles = await getCollection("articles");
 
-const relatedArticles = allArticles
+const matchedArticles = allArticles
   .filter((item) => item.id !== article.id)
   .filter(
     (item) =>
@@ -31,8 +31,18 @@ const relatedArticles = allArticles
   .sort(
     (a, b) =>
       b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
-  )
-  .slice(0, 3);
+  );
+
+const fallbackArticles = allArticles
+  .filter((item) => item.id !== article.id)
+  .sort(
+    (a, b) =>
+      b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
+  );
+
+const relatedArticles = (
+  matchedArticles.length > 0 ? matchedArticles : fallbackArticles
+).slice(0, 3);
 
 const canonicalURL = new URL(
   `/articles/${article.id}/`,

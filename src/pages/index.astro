@@ -3,7 +3,9 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { getCollection } from 'astro:content';
 
-// Featured Destinations Data - Clear and easy to edit
+// Fetch all articles first — needed by both sections below
+const allArticles = await getCollection('articles');
+
 // Featured Destinations - built dynamically from real articles
 const slugify = (value) =>
   value
@@ -40,7 +42,6 @@ const featuredDestinations = Object.values(destinationMap)
   }));
 
 // Latest Articles - pulled dynamically from real content, newest first
-const allArticles = await getCollection('articles');
 const latestArticles = allArticles
   .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
   .slice(0, 6)

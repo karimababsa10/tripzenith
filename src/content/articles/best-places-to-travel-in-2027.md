@@ -10,7 +10,7 @@ region: "Global"
 tags:
  - travel
  -  destinations
- -  2027
+ -  "2027"
  -  top places to travel
  -  must-visit destinations
 ---

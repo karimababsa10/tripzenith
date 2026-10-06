@@ -6,7 +6,7 @@ image: "https://raw.githubusercontent.com/karimababsa10/tripzenith/main/public/b
 category: "Destinations"
 destination: "Sarandë"
 country: "Albania"
-region: "Balkan"
+region: "Europe"
 tags:
  - Sarandë
  -  travel

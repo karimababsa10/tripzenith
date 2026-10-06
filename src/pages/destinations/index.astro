@@ -30,328 +30,1345 @@ for (const article of articles) {
 const sortedRegions = Object.entries(regions).sort(([a], [b]) =>
   a.localeCompare(b)
 );
+
+const browseableRegions = ["Europe", "Asia", "Americas", "Oceania"];
+
+const globalArticles = articles
+  .filter((article) => ["Global", "Worldwide"].includes(article.data.region))
+  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+
+const regionInfo = {
+  Europe: {
+    number: "01",
+    description:
+      "Historic cities, Mediterranean coastlines, dramatic landscapes, and some of the world's most unforgettable journeys.",
+  },
+  Asia: {
+    number: "02",
+    description:
+      "Ancient cultures, vibrant cities, tropical escapes, incredible food, and endless places to discover.",
+  },
+  Americas: {
+    number: "03",
+    description:
+      "From iconic cities to wild landscapes, explore diverse destinations across North, Central, and South America.",
+  },
+  Oceania: {
+    number: "04",
+    description:
+      "Remote islands, extraordinary coastlines, outdoor adventures, and unforgettable Pacific journeys.",
+  },
+  Africa: {
+    number: "05",
+    description:
+      "Wild landscapes, extraordinary cultures, ancient cities, and unforgettable adventures across the continent.",
+  },
+};
+
+const regionIcons = {
+  Europe: "✦",
+  Asia: "◈",
+  Americas: "◇",
+  Oceania: "○",
+  Africa: "✧",
+};
 ---
 
 <BaseLayout
-  title="Travel Destinations"
-  description="Explore travel destinations around the world with TripZenith travel guides, things to do, and practical travel tips."
+  title="Explore Destinations"
+  description="Explore destinations around the world with TripZenith. Discover countries, cities, travel guides, things to do, and practical travel tips."
 >
-  <section class="hero">
-    <p class="eyebrow">TRIPZENITH DESTINATIONS</p>
+  <main class="destinations-page">
 
-    <h1>Explore Destinations.</h1>
+    <!-- HERO -->
+    <section class="destination-hero">
+      <div class="hero-glow hero-glow-one"></div>
+      <div class="hero-glow hero-glow-two"></div>
 
-    <p class="intro">
-      Discover cities, countries, and regions around the world with
-      practical travel guides and inspiring things to do.
-    </p>
-  </section>
+      <div class="container hero-container">
 
-  <section class="destinations-section">
-    {sortedRegions.map(([region, countries]) => (
-      <div class="region-block">
-        <div class="region-heading">
-          <div>
-            <p class="section-label">REGION</p>
+        <div class="hero-eyebrow">
+          <span class="eyebrow-line"></span>
+          TRIPZENITH DESTINATIONS
+          <span class="eyebrow-line"></span>
+        </div>
 
-            <h2>
-              <a href={`/destinations/${slugify(region)}/`}>
-                {region}
-              </a>
-            </h2>
-          </div>
+        <h1>
+          Go somewhere<br />
+          <em>worth remembering.</em>
+        </h1>
 
-          <a
-            href={`/destinations/${slugify(region)}/`}
-            class="region-link"
-          >
-            Explore region →
+        <p class="hero-description">
+          Explore cities, countries, and regions around the world.
+          Find inspiration, discover places to visit, and start planning
+          your next adventure.
+        </p>
+
+        <div class="hero-actions">
+          <a href="#regions" class="primary-button">
+            Explore the world
+            <span>↓</span>
+          </a>
+
+          <a href="/blog/" class="secondary-button">
+            Read travel guides
+            <span>→</span>
           </a>
         </div>
 
-        <div class="countries-grid">
-          {Object.entries(countries)
-            .sort(([a], [b]) => a.localeCompare(b))
-            .map(([country, destinations]) => (
-              <div class="country-card">
-                <div class="country-top">
-                  <p class="country-label">COUNTRY</p>
+        <div class="hero-scroll">
+          <span class="scroll-line"></span>
+          Scroll to explore
+        </div>
+
+      </div>
+    </section>
+
+
+    <!-- INTRO -->
+    <section class="intro-section">
+      <div class="container intro-grid">
+
+        <div>
+          <p class="section-label">THE WORLD IS WAITING</p>
+          <h2>
+            Where will<br />
+            you go next?
+          </h2>
+        </div>
+
+        <div class="intro-copy">
+          <p>
+            From iconic European cities to far-flung islands,
+            TripZenith brings destinations together in one place.
+          </p>
+
+          <p>
+            Browse by region, explore countries, then discover the
+            cities and places that make each destination special.
+          </p>
+        </div>
+
+      </div>
+    </section>
+
+
+    <!-- REGIONS -->
+    <section class="regions-section" id="regions">
+
+      <div class="container">
+
+        <div class="section-heading">
+
+          <div>
+            <p class="section-label">EXPLORE THE WORLD</p>
+            <h2>Choose your region.</h2>
+          </div>
+
+          <p class="section-heading-copy">
+            Start broad, then follow the map to the places
+            you want to explore.
+          </p>
+
+        </div>
+
+
+        <div class="region-grid">
+
+          {sortedRegions.filter(([region]) => browseableRegions.includes(region)).map(([region, countries], index) => {
+            const info = regionInfo[region] || {
+              number: String(index + 1).padStart(2, "0"),
+              description:
+                "Discover countries, cities, and unforgettable places across this region.",
+            };
+
+            const icon = regionIcons[region] || "✦";
+
+            const countryCount = Object.keys(countries).length;
+
+            const cityCount = Object.values(countries).reduce(
+              (total, destinations) => total + destinations.size,
+              0
+            );
+
+            return (
+              <a
+                href={`/destinations/${slugify(region)}/`}
+                class="region-card"
+              >
+
+                <div class="region-card-top">
+                  <span class="region-number">
+                    {info.number}
+                  </span>
+
+                  <span class="region-icon">
+                    {icon}
+                  </span>
+                </div>
+
+                <div class="region-card-content">
+
+                  <p class="region-mini-label">
+                    REGION
+                  </p>
+
+                  <h3>{region}</h3>
+
+                  <p class="region-description">
+                    {info.description}
+                  </p>
+
+                </div>
+
+                <div class="region-card-bottom">
+
+                  <span>
+                    {countryCount} {countryCount === 1 ? "country" : "countries"}
+                  </span>
+
+                  <span>
+                    {cityCount} {cityCount === 1 ? "destination" : "destinations"}
+                  </span>
+
+                  <strong>
+                    Explore →
+                  </strong>
+
+                </div>
+
+              </a>
+            );
+          })}
+
+        </div>
+
+      </div>
+    </section>
+
+
+    <!-- COUNTRY DIRECTORY -->
+    <section class="directory-section">
+
+      <div class="container">
+
+        <div class="directory-header">
+
+          <div>
+            <p class="section-label">DESTINATION DIRECTORY</p>
+            <h2>Explore by country.</h2>
+          </div>
+
+          <p>
+            Discover cities and destinations organized by
+            region and country.
+          </p>
+
+        </div>
+
+
+        {sortedRegions.filter(([region]) => browseableRegions.includes(region)).map(([region, countries]) => (
+
+          <section class="region-directory">
+
+            <div class="directory-region-heading">
+
+              <div class="directory-region-title">
+
+                <span>
+                  {regionIcons[region] || "✦"}
+                </span>
+
+                <div>
+                  <p>{region}</p>
+
+                  <h3>
+                    <a href={`/destinations/${slugify(region)}/`}>
+                      Explore {region}
+                    </a>
+                  </h3>
+                </div>
+
+              </div>
+
+              <a
+                href={`/destinations/${slugify(region)}/`}
+                class="directory-link"
+              >
+                View region →
+              </a>
+
+            </div>
+
+
+            <div class="country-grid">
+
+              {Object.entries(countries)
+                .sort(([a], [b]) => a.localeCompare(b))
+                .map(([country, destinations]) => (
+
+                  <article class="country-card">
+
+                    <div class="country-card-header">
+
+                      <span class="country-number">
+                        {String(
+                          [...Object.keys(countries)].indexOf(country) + 1
+                        ).padStart(2, "0")}
+                      </span>
+
+                      <a
+                        href={`/destinations/${slugify(country)}/`}
+                        class="country-arrow"
+                        aria-label={`Explore ${country}`}
+                      >
+                        ↗
+                      </a>
+
+                    </div>
+
+                    <h4>
+                      <a href={`/destinations/${slugify(country)}/`}>
+                        {country}
+                      </a>
+                    </h4>
+
+                    <div class="city-list">
+
+                      {[...destinations]
+                        .sort((a, b) => a.localeCompare(b))
+                        .map((destination) => (
+
+                          <a
+                            href={`/destinations/${slugify(country)}/${slugify(destination)}/`}
+                            class="city-link"
+                          >
+                            <span>{destination}</span>
+                            <span class="city-arrow">→</span>
+                          </a>
+
+                        ))}
+
+                    </div>
+
+                    <a
+                      href={`/destinations/${slugify(country)}/`}
+                      class="country-explore"
+                    >
+                      Explore {country}
+                    </a>
+
+                  </article>
+
+                ))}
+
+            </div>
+
+          </section>
+
+        ))}
+
+      </div>
+
+    </section>
+
+
+    <!-- GLOBAL INSPIRATION -->
+    {globalArticles.length > 0 && (
+      <section class="global-section">
+        <div class="container">
+
+          <div class="global-header">
+            <div>
+              <p class="section-label">GLOBAL INSPIRATION</p>
+              <h2>Go beyond the map.</h2>
+            </div>
+
+            <p>
+              Travel ideas that are not tied to one specific region.
+              Get inspired, then choose where your next journey takes you.
+            </p>
+          </div>
+
+          <div class="global-grid">
+            {globalArticles.map((article) => (
+              <article class="global-card">
+
+                {article.data.image && (
+                  <a
+                    href={`/articles/${article.id}/`}
+                    class="global-image"
+                  >
+                    <img
+                      src={article.data.image}
+                      alt={article.data.title}
+                      loading="lazy"
+                    />
+                  </a>
+                )}
+
+                <div class="global-content">
+                  <p class="global-meta">
+                    {article.data.region}
+                  </p>
+
+                  <h3>
+                    <a href={`/articles/${article.id}/`}>
+                      {article.data.title}
+                    </a>
+                  </h3>
+
+                  <p>
+                    {article.data.description}
+                  </p>
 
                   <a
-                    href={`/destinations/${slugify(country)}/`}
-                    class="country-link"
+                    href={`/articles/${article.id}/`}
+                    class="global-read"
                   >
-                    View country →
+                    Read guide ?
                   </a>
                 </div>
 
-                <h3>
-                  <a href={`/destinations/${slugify(country)}/`}>
-                    {country}
-                  </a>
-                </h3>
-
-                <div class="cities">
-                  {[...destinations]
-                    .sort((a, b) => a.localeCompare(b))
-                    .map((destination) => (
-                      <a
-                        href={`/destinations/${slugify(country)}/${slugify(destination)}/`}
-                        class="city-link"
-                      >
-                        {destination}
-                        <span>→</span>
-                      </a>
-                    ))}
-                </div>
-              </div>
+              </article>
             ))}
+          </div>
+
         </div>
+      </section>
+    )}
+    <!-- TRAVEL GUIDE CTA -->
+    <section class="final-section">
+
+      <div class="container">
+
+        <div class="final-card">
+
+          <div class="final-card-background">
+            <span>TRIP</span>
+            <span>ZENITH</span>
+          </div>
+
+          <div class="final-card-content">
+
+            <p class="section-label">
+              PLAN YOUR NEXT ADVENTURE
+            </p>
+
+            <h2>
+              The world is<br />
+              bigger than your<br />
+              bucket list.
+            </h2>
+
+            <p>
+              Discover practical travel guides, things to do,
+              and ideas for your next unforgettable trip.
+            </p>
+
+            <a href="/blog/" class="final-button">
+              Explore travel guides
+              <span>→</span>
+            </a>
+
+          </div>
+
+        </div>
+
       </div>
-    ))}
-  </section>
 
-  <section class="bottom-cta">
-    <p class="section-label">TRAVEL WITH TRIPZENITH</p>
+    </section>
 
-    <h2>Find your next destination.</h2>
-
-    <p>
-      Explore our travel guides and discover places worth adding to
-      your next trip.
-    </p>
-
-    <a href="/blog/" class="cta-button">
-      Explore travel guides
-    </a>
-  </section>
+  </main>
 </BaseLayout>
 
+
 <style>
-.hero {
-  max-width: 850px;
-  margin: 2rem auto 6rem;
-  text-align: center;
-}
 
-.eyebrow {
-  margin-bottom: 1rem;
-  color: #777;
-  font-size: 0.72rem;
-  font-weight: 700;
-  letter-spacing: 0.16em;
-}
-
-.hero h1 {
-  margin-bottom: 1.3rem;
-  font-size: clamp(3.2rem, 8vw, 6rem);
-  line-height: 0.95;
-  letter-spacing: -0.06em;
-}
-
-.intro {
-  max-width: 650px;
-  margin: 0 auto;
-  color: #666;
-  font-size: 1.15rem;
-  line-height: 1.7;
-}
-
-.destinations-section {
-  margin-bottom: 7rem;
-}
-
-.region-block {
-  margin-bottom: 5rem;
-}
-
-.region-heading {
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: 2rem;
-  margin-bottom: 2rem;
-  padding-bottom: 1.2rem;
-  border-bottom: 1px solid #e8e8e5;
-}
-
-.section-label {
-  margin-bottom: 0.5rem;
-  color: #888;
-  font-size: 0.7rem;
-  font-weight: 700;
-  letter-spacing: 0.16em;
-}
-
-.region-heading h2 {
-  margin: 0;
-  font-size: 2.5rem;
-  letter-spacing: -0.045em;
-}
-
-.region-heading h2 a {
-  color: #111;
-  text-decoration: none;
-}
-
-.region-link {
-  color: #111;
-  font-size: 0.9rem;
-  font-weight: 700;
-  text-decoration: none;
-  white-space: nowrap;
-}
-
-.countries-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 1.5rem;
-}
-
-.country-card {
-  padding: 2rem;
-  border: 1px solid #e8e8e5;
-  border-radius: 20px;
-  background: #fff;
-  transition:
-    transform 0.25s ease,
-    box-shadow 0.25s ease;
-}
-
-.country-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.06);
-}
-
-.country-top {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  margin-bottom: 1rem;
-}
-
-.country-label {
-  margin: 0;
-  color: #999;
-  font-size: 0.68rem;
-  font-weight: 700;
-  letter-spacing: 0.14em;
-}
-
-.country-link {
-  color: #777;
-  font-size: 0.78rem;
-  font-weight: 600;
-  text-decoration: none;
-}
-
-.country-card h3 {
-  margin-bottom: 1.5rem;
-  font-size: 2rem;
-  letter-spacing: -0.04em;
-}
-
-.country-card h3 a {
-  color: #111;
-  text-decoration: none;
-}
-
-.cities {
-  display: flex;
-  flex-direction: column;
-  gap: 0.7rem;
-}
-
-.city-link {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding-bottom: 0.7rem;
-  border-bottom: 1px solid #eeeeeb;
-  color: #444;
-  font-size: 0.95rem;
-  text-decoration: none;
-  transition: color 0.2s ease;
-}
-
-.city-link:last-child {
-  padding-bottom: 0;
-  border-bottom: none;
-}
-
-.city-link span {
-  color: #999;
-  transition: transform 0.2s ease;
-}
-
-.city-link:hover {
-  color: #111;
-}
-
-.city-link:hover span {
-  transform: translateX(4px);
-}
-
-.bottom-cta {
-  max-width: 800px;
-  margin: 0 auto 4rem;
-  padding: 4rem 2rem;
-  border-radius: 24px;
-  background: #f3f3ef;
-  text-align: center;
-}
-
-.bottom-cta h2 {
-  margin-bottom: 1rem;
-  font-size: clamp(2rem, 5vw, 3rem);
-  letter-spacing: -0.045em;
-}
-
-.bottom-cta > p:not(.section-label) {
-  max-width: 550px;
-  margin: 0 auto 2rem;
-  color: #666;
-  line-height: 1.7;
-}
-
-.cta-button {
-  display: inline-block;
-  padding: 0.9rem 1.4rem;
-  border-radius: 999px;
-  background: #111;
-  color: #fff;
-  font-size: 0.9rem;
-  font-weight: 700;
-  text-decoration: none;
-  transition: transform 0.2s ease;
-}
-
-.cta-button:hover {
-  transform: translateY(-2px);
-}
-
-@media (max-width: 700px) {
-  .hero {
-    margin-bottom: 4rem;
+  :global(html) {
+    scroll-behavior: smooth;
   }
 
-  .region-heading {
-    align-items: flex-start;
+  .destinations-page {
+    overflow: hidden;
+    background: #fafaf8;
+    color: #111;
+  }
+
+  .container {
+    width: min(1180px, calc(100% - 40px));
+    margin: 0 auto;
+  }
+
+
+  /* =========================
+     HERO
+  ========================= */
+
+  .destination-hero {
+    position: relative;
+    min-height: 720px;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+    background:
+      radial-gradient(
+        circle at 78% 30%,
+        rgba(210, 190, 150, 0.2),
+        transparent 30%
+      ),
+      #f1f0eb;
+  }
+
+  .hero-container {
+    position: relative;
+    z-index: 2;
+    padding: 110px 0 100px;
+    text-align: center;
+  }
+
+  .hero-glow {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(2px);
+    opacity: 0.45;
+    pointer-events: none;
+  }
+
+  .hero-glow-one {
+    width: 380px;
+    height: 380px;
+    top: -100px;
+    right: -80px;
+    background: #ddd6c7;
+  }
+
+  .hero-glow-two {
+    width: 280px;
+    height: 280px;
+    bottom: -130px;
+    left: -80px;
+    background: #e2dfd5;
+  }
+
+  .hero-eyebrow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    margin-bottom: 30px;
+    color: #777;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+  }
+
+  .eyebrow-line {
+    width: 34px;
+    height: 1px;
+    background: #aaa;
+  }
+
+  .destination-hero h1 {
+    max-width: 1000px;
+    margin: 0 auto;
+    font-size: clamp(4rem, 9vw, 8.2rem);
+    line-height: 0.88;
+    letter-spacing: -0.075em;
+    font-weight: 700;
+  }
+
+  .destination-hero h1 em {
+    font-family: Georgia, "Times New Roman", serif;
+    font-weight: 400;
+    letter-spacing: -0.06em;
+  }
+
+  .hero-description {
+    max-width: 650px;
+    margin: 38px auto 0;
+    color: #666;
+    font-size: 18px;
+    line-height: 1.75;
+  }
+
+  .hero-actions {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 34px;
+  }
+
+  .primary-button,
+  .secondary-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 20px;
+    border-radius: 999px;
+    font-size: 14px;
+    font-weight: 700;
+    text-decoration: none;
+    transition:
+      transform 0.2s ease,
+      background 0.2s ease;
+  }
+
+  .primary-button {
+    background: #111;
+    color: white;
+  }
+
+  .secondary-button {
+    border: 1px solid #d2d0ca;
+    background: rgba(255, 255, 255, 0.45);
+    color: #111;
+  }
+
+  .primary-button:hover,
+  .secondary-button:hover {
+    transform: translateY(-2px);
+  }
+
+  .hero-scroll {
+    display: flex;
     flex-direction: column;
-    gap: 0.8rem;
+    align-items: center;
+    gap: 10px;
+    margin-top: 75px;
+    color: #888;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
   }
 
-  .countries-grid {
-    grid-template-columns: 1fr;
+  .scroll-line {
+    width: 1px;
+    height: 38px;
+    background: #aaa;
+  }
+
+
+  /* =========================
+     INTRO
+  ========================= */
+
+  .intro-section {
+    padding: 120px 0;
+    background: #fff;
+  }
+
+  .intro-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 100px;
+    align-items: end;
+  }
+
+  .section-label {
+    margin: 0 0 14px;
+    color: #888;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.17em;
+  }
+
+  .intro-grid h2 {
+    margin: 0;
+    font-size: clamp(3rem, 6vw, 5.2rem);
+    line-height: 0.94;
+    letter-spacing: -0.065em;
+  }
+
+  .intro-copy {
+    max-width: 500px;
+    color: #666;
+    font-size: 18px;
+    line-height: 1.8;
+  }
+
+  .intro-copy p {
+    margin: 0 0 20px;
+  }
+
+
+  /* =========================
+     REGIONS
+  ========================= */
+
+  .regions-section {
+    padding: 120px 0;
+    background: #f1f0eb;
+  }
+
+  .section-heading {
+    display: flex;
+    justify-content: space-between;
+    align-items: end;
+    gap: 50px;
+    margin-bottom: 55px;
+  }
+
+  .section-heading h2 {
+    margin: 0;
+    font-size: clamp(2.8rem, 5vw, 4.5rem);
+    line-height: 0.95;
+    letter-spacing: -0.06em;
+  }
+
+  .section-heading-copy {
+    max-width: 360px;
+    margin: 0;
+    color: #707070;
+    font-size: 15px;
+    line-height: 1.7;
+  }
+
+  .region-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 18px;
+  }
+
+  .region-card {
+    position: relative;
+    min-height: 390px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 30px;
+    overflow: hidden;
+    border: 1px solid #dedcd5;
+    border-radius: 24px;
+    background: #fff;
+    color: #111;
+    text-decoration: none;
+    transition:
+      transform 0.3s ease,
+      box-shadow 0.3s ease;
+  }
+
+  .region-card:hover {
+    transform: translateY(-7px);
+    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.08);
+  }
+
+  .region-card:nth-child(2n) {
+    background: #171717;
+    color: white;
+    border-color: #171717;
+  }
+
+  .region-card:nth-child(2n) .region-mini-label,
+  .region-card:nth-child(2n) .region-description,
+  .region-card:nth-child(2n) .region-number {
+    color: #aaa;
+  }
+
+  .region-card:nth-child(2n) .region-card-bottom {
+    border-color: #333;
+    color: #bbb;
+  }
+
+  .region-card:nth-child(2n) .region-card-bottom strong {
+    color: white;
+  }
+
+  .region-card-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .region-number {
+    color: #999;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+  }
+
+  .region-icon {
+    font-size: 25px;
+    font-weight: 300;
+  }
+
+  .region-mini-label {
+    margin: 0 0 12px;
+    color: #999;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.17em;
+  }
+
+  .region-card-content h3 {
+    margin: 0 0 20px;
+    font-size: clamp(2.7rem, 5vw, 4.5rem);
+    line-height: 0.9;
+    letter-spacing: -0.06em;
+  }
+
+  .region-description {
+    max-width: 450px;
+    margin: 0;
+    color: #666;
+    font-size: 15px;
+    line-height: 1.7;
+  }
+
+  .region-card-bottom {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding-top: 20px;
+    border-top: 1px solid #e8e8e4;
+    color: #777;
+    font-size: 11px;
+  }
+
+  .region-card-bottom strong {
+    margin-left: auto;
+    color: #111;
+    font-size: 12px;
+  }
+
+
+  /* =========================
+     DIRECTORY
+  ========================= */
+
+  .directory-section {
+    padding: 120px 0 80px;
+    background: #fff;
+  }
+
+  .directory-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: end;
+    gap: 40px;
+    margin-bottom: 90px;
+  }
+
+  .directory-header h2 {
+    margin: 0;
+    font-size: clamp(3rem, 6vw, 5rem);
+    line-height: 0.95;
+    letter-spacing: -0.065em;
+  }
+
+  .directory-header > p {
+    max-width: 370px;
+    margin: 0;
+    color: #777;
+    line-height: 1.7;
+  }
+
+  .region-directory {
+    margin-bottom: 95px;
+  }
+
+  .directory-region-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 30px;
+    padding-bottom: 22px;
+    margin-bottom: 28px;
+    border-bottom: 1px solid #ddd;
+  }
+
+  .directory-region-title {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+  }
+
+  .directory-region-title > span {
+    width: 46px;
+    height: 46px;
+    display: grid;
+    place-items: center;
+    border: 1px solid #ddd;
+    border-radius: 50%;
+    font-size: 18px;
+  }
+
+  .directory-region-title p {
+    margin: 0 0 4px;
+    color: #999;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+  }
+
+  .directory-region-title h3 {
+    margin: 0;
+    font-size: 30px;
+    letter-spacing: -0.04em;
+  }
+
+  .directory-region-title h3 a {
+    color: #111;
+    text-decoration: none;
+  }
+
+  .directory-link {
+    color: #555;
+    font-size: 12px;
+    font-weight: 700;
+    text-decoration: none;
+  }
+
+  .country-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
   }
 
   .country-card {
-    padding: 1.5rem;
+    padding: 25px;
+    border: 1px solid #e5e4df;
+    border-radius: 16px;
+    background: #fafaf8;
+    transition:
+      background 0.2s ease,
+      transform 0.2s ease,
+      border-color 0.2s ease;
   }
 
-  .bottom-cta {
-    padding: 3rem 1.5rem;
+  .country-card:hover {
+    transform: translateY(-3px);
+    background: #fff;
+    border-color: #cfcfc8;
   }
-}
+
+  .country-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .country-number {
+    color: #aaa;
+    font-size: 10px;
+    font-weight: 700;
+  }
+
+  .country-arrow {
+    width: 30px;
+    height: 30px;
+    display: grid;
+    place-items: center;
+    border: 1px solid #ddd;
+    border-radius: 50%;
+    color: #111;
+    text-decoration: none;
+    transition: transform 0.2s ease;
+  }
+
+  .country-arrow:hover {
+    transform: rotate(10deg);
+  }
+
+  .country-card h4 {
+    margin: 30px 0 22px;
+    font-size: 26px;
+    letter-spacing: -0.045em;
+  }
+
+  .country-card h4 a {
+    color: #111;
+    text-decoration: none;
+  }
+
+  .city-list {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .city-link {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    padding: 10px 0;
+    border-bottom: 1px solid #e8e8e3;
+    color: #555;
+    font-size: 13px;
+    text-decoration: none;
+    transition: color 0.2s ease;
+  }
+
+  .city-link:last-child {
+    border-bottom: none;
+  }
+
+  .city-link:hover {
+    color: #111;
+  }
+
+  .city-arrow {
+    color: #aaa;
+    transition: transform 0.2s ease;
+  }
+
+  .city-link:hover .city-arrow {
+    transform: translateX(4px);
+    color: #111;
+  }
+
+  .country-explore {
+    display: inline-block;
+    margin-top: 20px;
+    color: #111;
+    font-size: 11px;
+    font-weight: 700;
+    text-decoration: none;
+  }
+
+
+  /* =========================
+     GLOBAL INSPIRATION
+  ========================= */
+
+  .global-section {
+    padding: 100px 0 80px;
+    background: #f1f0eb;
+  }
+
+  .global-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: end;
+    gap: 50px;
+    margin-bottom: 50px;
+  }
+
+  .global-header h2 {
+    margin: 0;
+    font-size: clamp(3rem, 6vw, 5rem);
+    line-height: 0.95;
+    letter-spacing: -0.065em;
+  }
+
+  .global-header > p {
+    max-width: 390px;
+    margin: 0;
+    color: #707070;
+    font-size: 15px;
+    line-height: 1.7;
+  }
+
+  .global-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+  }
+
+  .global-card {
+    overflow: hidden;
+    border: 1px solid #dedcd5;
+    border-radius: 24px;
+    background: #fff;
+    transition:
+      transform 0.3s ease,
+      box-shadow 0.3s ease;
+  }
+
+  .global-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.08);
+  }
+
+  .global-image {
+    display: block;
+    height: 280px;
+    overflow: hidden;
+  }
+
+  .global-image img {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+  }
+
+  .global-card:hover .global-image img {
+    transform: scale(1.04);
+  }
+
+  .global-content {
+    padding: 28px;
+  }
+
+  .global-meta {
+    margin: 0 0 10px;
+    color: #999;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+  }
+
+  .global-content h3 {
+    margin: 0 0 14px;
+    font-size: 28px;
+    line-height: 1.05;
+    letter-spacing: -0.045em;
+  }
+
+  .global-content h3 a {
+    color: #111;
+    text-decoration: none;
+  }
+
+  .global-content > p:not(.global-meta) {
+    margin: 0 0 20px;
+    color: #666;
+    line-height: 1.7;
+  }
+
+  .global-read {
+    color: #111;
+    font-size: 12px;
+    font-weight: 700;
+    text-decoration: none;
+  }
+
+  /* =========================
+     FINAL CTA
+  ========================= */
+
+  .final-section {
+    padding: 50px 0 120px;
+    background: #fff;
+  }
+
+  .final-card {
+    position: relative;
+    min-height: 520px;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+    border-radius: 28px;
+    background: #151515;
+    color: white;
+  }
+
+  .final-card-background {
+    position: absolute;
+    right: -30px;
+    bottom: -100px;
+    display: flex;
+    flex-direction: column;
+    font-size: clamp(8rem, 20vw, 17rem);
+    font-weight: 800;
+    line-height: 0.7;
+    letter-spacing: -0.09em;
+    color: rgba(255, 255, 255, 0.035);
+    pointer-events: none;
+  }
+
+  .final-card-content {
+    position: relative;
+    z-index: 2;
+    max-width: 600px;
+    padding: 70px;
+  }
+
+  .final-card-content .section-label {
+    color: #999;
+  }
+
+  .final-card h2 {
+    margin: 0 0 25px;
+    font-size: clamp(3rem, 6vw, 5.8rem);
+    line-height: 0.9;
+    letter-spacing: -0.065em;
+  }
+
+  .final-card-content > p:not(.section-label) {
+    max-width: 470px;
+    margin: 0 0 30px;
+    color: #aaa;
+    line-height: 1.7;
+  }
+
+  .final-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 20px;
+    border-radius: 999px;
+    background: white;
+    color: #111;
+    font-size: 13px;
+    font-weight: 700;
+    text-decoration: none;
+    transition: transform 0.2s ease;
+  }
+
+  .final-button:hover {
+    transform: translateY(-2px);
+  }
+
+
+  /* =========================
+     TABLET
+  ========================= */
+
+  @media (max-width: 900px) {
+
+    .destination-hero {
+      min-height: 650px;
+    }
+
+    .intro-grid {
+      grid-template-columns: 1fr;
+      gap: 40px;
+    }
+
+    .region-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .country-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    .global-header {
+      align-items: flex-start;
+      flex-direction: column;
+      gap: 25px;
+    }
+
+    .global-grid {
+      grid-template-columns: 1fr;
+    }
+    .directory-header {
+      align-items: flex-start;
+      flex-direction: column;
+      gap: 25px;
+    }
+
+    .section-heading {
+      align-items: flex-start;
+      flex-direction: column;
+      gap: 25px;
+    }
+
+  }
+
+
+  /* =========================
+     MOBILE
+  ========================= */
+
+  @media (max-width: 600px) {
+
+    .container {
+      width: min(100% - 28px, 1180px);
+    }
+
+    .destination-hero {
+      min-height: auto;
+    }
+
+    .hero-container {
+      padding: 90px 0 70px;
+    }
+
+    .destination-hero h1 {
+      font-size: clamp(3.4rem, 17vw, 5rem);
+    }
+
+    .hero-description {
+      font-size: 16px;
+    }
+
+    .hero-actions {
+      flex-direction: column;
+      align-items: stretch;
+      max-width: 300px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .primary-button,
+    .secondary-button {
+      justify-content: center;
+    }
+
+    .hero-scroll {
+      margin-top: 50px;
+    }
+
+    .intro-section,
+    .regions-section,
+    .directory-section {
+      padding: 80px 0;
+    }
+
+    .intro-grid h2 {
+      font-size: 3.4rem;
+    }
+
+    .region-card {
+      min-height: 350px;
+      padding: 24px;
+    }
+
+    .region-card-content h3 {
+      font-size: 3.2rem;
+    }
+
+    .region-card-bottom {
+      flex-wrap: wrap;
+    }
+
+    .region-card-bottom strong {
+      width: 100%;
+      margin-left: 0;
+      padding-top: 8px;
+    }
+
+    .country-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .directory-region-heading {
+      align-items: flex-start;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    .final-section {
+      padding-bottom: 70px;
+    }
+
+    .final-card {
+      min-height: 500px;
+    }
+
+    .final-card-content {
+      padding: 40px 28px;
+    }
+
+    .final-card h2 {
+      font-size: 3.4rem;
+    }
+
+  }
+
 </style>
+
+
+
+
+
+
+
+

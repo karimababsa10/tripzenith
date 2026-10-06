@@ -4,13 +4,13 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
 
 const articles = await getCollection("articles");
 
-const europeArticles = articles.filter(
-  (article) => article.data.region === "Europe"
+const AsiaArticles = articles.filter(
+  (article) => article.data.region === "Asia"
 );
 
 const countries = {};
 
-for (const article of europeArticles) {
+for (const article of AsiaArticles) {
   const { country, destination } = article.data;
 
   if (!countries[country]) {
@@ -33,8 +33,8 @@ const slugify = (value) =>
 ---
 
 <BaseLayout
-  title="Europe Travel Destinations"
-  description="Explore European countries, cities, destinations, and travel guides with TripZenith."
+  title="Asia Travel Destinations"
+  description="Explore Asiaan countries, cities, destinations, and travel guides with TripZenith."
 >
 
   <main class="region-page">
@@ -42,10 +42,10 @@ const slugify = (value) =>
     <section class="destination-header">
       <p class="eyebrow">TRIPZENITH DESTINATIONS</p>
 
-      <h1>Explore Europe.</h1>
+      <h1>Explore Asia.</h1>
 
       <p>
-        Discover European countries, cities, landmarks, food, culture,
+        Discover Asiaan countries, cities, landmarks, food, culture,
         and unforgettable travel experiences.
       </p>
     </section>
@@ -56,7 +56,7 @@ const slugify = (value) =>
       <div class="directory-container">
 
         <div class="section-heading">
-          <p class="section-label">EUROPE</p>
+          <p class="section-label">Asia</p>
           <h2>Choose a country.</h2>
           <p>
             Start with a country, then explore its cities and travel guides.
@@ -345,3 +345,4 @@ const slugify = (value) =>
 }
 
 </style>
+

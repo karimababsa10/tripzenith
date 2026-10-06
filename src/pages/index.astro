@@ -2,9 +2,8 @@
 import BaseLayout from "../layouts/BaseLayout.astro";
 import { getCollection } from "astro:content";
 
-<<<<<<< HEAD
 // Fetch all articles first — needed by both sections below
-const allArticles = await getCollection('articles');
+const allArticles = await getCollection("articles");
 
 // Featured Destinations - built dynamically from real articles
 const slugify = (value) =>
@@ -24,9 +23,11 @@ for (const article of allArticles) {
     destinationMap[key] = {
       name: destination,
       country: country,
-      image: image || 'https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?auto=format&fit=crop&w=800&q=80',
+      image:
+        image ||
+        "https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?auto=format&fit=crop&w=800&q=80",
       count: 0,
-      link: `/destinations/${slugify(country)}/`
+      link: `/destinations/${slugify(country)}/`,
     };
   }
 
@@ -38,14 +39,10 @@ const featuredDestinations = Object.values(destinationMap)
   .slice(0, 4)
   .map((dest) => ({
     ...dest,
-    articleCount: `${dest.count} Guide${dest.count > 1 ? 's' : ''}`
+    articleCount: `${dest.count} Guide${dest.count > 1 ? "s" : ""}`,
   }));
 
 // Latest Articles - pulled dynamically from real content, newest first
-=======
-const allArticles = await getCollection("articles");
-
->>>>>>> 205ebff (Backup local changes before syncing with GitHub)
 const latestArticles = allArticles
   .sort(
     (a, b) =>

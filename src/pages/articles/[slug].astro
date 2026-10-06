@@ -144,6 +144,7 @@ const breadcrumbSchema = {
   <main class="article-page">
     <div class="container">
 
+      <!-- Breadcrumbs -->
       <nav class="breadcrumbs" aria-label="Breadcrumb">
         <a href="/">Home</a>
         <span>/</span>
@@ -151,13 +152,15 @@ const breadcrumbSchema = {
         <a href="/blog/">Blog</a>
         <span>/</span>
 
-        <a href={`/destinations/${article.data.country
-          .toLowerCase()
-          .replace(/[^a-z0-9]+/g, "-")
-          .replace(/^-+|-+$/g, "")}/${article.data.destination
-          .toLowerCase()
-          .replace(/[^a-z0-9]+/g, "-")
-          .replace(/^-+|-+$/g, "")}/`}>
+        <a
+          href={`/destinations/${article.data.country
+            .toLowerCase()
+            .replace(/[^a-z0-9]+/g, "-")
+            .replace(/^-+|-+$/g, "")}/${article.data.destination
+            .toLowerCase()
+            .replace(/[^a-z0-9]+/g, "-")
+            .replace(/^-+|-+$/g, "")}/`}
+        >
           {article.data.destination}
         </a>
 
@@ -166,8 +169,10 @@ const breadcrumbSchema = {
         <span>{article.data.title}</span>
       </nav>
 
+      <!-- Main Article + Sidebar -->
       <div class="article-layout">
 
+        <!-- ARTICLE -->
         <article class="article">
 
           <header class="article-header">
@@ -200,6 +205,7 @@ const breadcrumbSchema = {
 
           </header>
 
+          <!-- Hero Image -->
           {article.data.image && (
             <figure class="hero-image">
               <img
@@ -213,14 +219,61 @@ const breadcrumbSchema = {
             </figure>
           )}
 
+          <!-- Article Content -->
           <div class="article-content">
             <Content />
           </div>
 
         </article>
 
+        <!-- SIDEBAR -->
         <aside class="sidebar">
 
+          <!-- RELATED ARTICLES -->
+          {relatedArticles.length > 0 && (
+            <div class="sidebar-box related-sidebar">
+
+              <h2>Related Articles</h2>
+
+              <div class="sidebar-related-list">
+
+                {relatedArticles.map((related) => (
+                  <a
+                    href={`/articles/${related.id}/`}
+                    class="sidebar-related-card"
+                  >
+
+                    {related.data.image && (
+                      <img
+                        src={related.data.image}
+                        alt={related.data.title}
+                        loading="lazy"
+                        width="100"
+                        height="70"
+                      />
+                    )}
+
+                    <div class="sidebar-related-content">
+
+                      <h3>
+                        {related.data.title}
+                      </h3>
+
+                      <span>
+                        Read article →
+                      </span>
+
+                    </div>
+
+                  </a>
+                ))}
+
+              </div>
+
+            </div>
+          )}
+
+          <!-- PLAN YOUR TRIP -->
           <div class="sidebar-box">
 
             <h2>Plan Your Trip</h2>
@@ -230,28 +283,40 @@ const breadcrumbSchema = {
               for your next adventure.
             </p>
 
-            <a href="/destinations/" class="sidebar-button">
+            <a
+              href="/destinations/"
+              class="sidebar-button"
+            >
               Explore Destinations
             </a>
 
           </div>
 
+          <!-- EXPLORE MORE -->
           <div class="sidebar-box">
 
             <h2>Explore More</h2>
 
             <ul>
+
               <li>
-                <a href="/blog/">Travel Guides</a>
+                <a href="/blog/">
+                  Travel Guides
+                </a>
               </li>
 
               <li>
-                <a href="/destinations/">Destinations</a>
+                <a href="/destinations/">
+                  Destinations
+                </a>
               </li>
 
               <li>
-                <a href="/about/">About TripZenith</a>
+                <a href="/about/">
+                  About TripZenith
+                </a>
               </li>
+
             </ul>
 
           </div>
@@ -260,6 +325,7 @@ const breadcrumbSchema = {
 
       </div>
 
+      <!-- MORE TRAVEL GUIDES -->
       {relatedArticles.length > 0 && (
         <section class="related-section">
 
@@ -292,9 +358,13 @@ const breadcrumbSchema = {
                     {related.data.category}
                   </span>
 
-                  <h3>{related.data.title}</h3>
+                  <h3>
+                    {related.data.title}
+                  </h3>
 
-                  <p>{related.data.description}</p>
+                  <p>
+                    {related.data.description}
+                  </p>
 
                   <span class="read-more">
                     Read Guide →
@@ -310,6 +380,7 @@ const breadcrumbSchema = {
         </section>
       )}
 
+      <!-- FINAL CTA -->
       <section class="final-cta">
 
         <span>TRIPZENITH</span>
@@ -360,6 +431,7 @@ const breadcrumbSchema = {
     color: #111;
   }
 
+  /* ARTICLE + SIDEBAR */
   .article-layout {
     display: grid;
     grid-template-columns: minmax(0, 1fr) 300px;
@@ -460,6 +532,7 @@ const breadcrumbSchema = {
     font-weight: 700;
   }
 
+  /* SIDEBAR */
   .sidebar {
     position: sticky;
     top: 30px;
@@ -484,6 +557,79 @@ const breadcrumbSchema = {
     line-height: 1.6;
   }
 
+  /* RELATED ARTICLES SIDEBAR */
+  .related-sidebar {
+    padding: 22px;
+  }
+
+  .related-sidebar h2 {
+    margin-bottom: 18px;
+  }
+
+  .sidebar-related-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .sidebar-related-card {
+    display: grid;
+    grid-template-columns: 82px 1fr;
+    gap: 12px;
+    align-items: center;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #e5e5e5;
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .sidebar-related-card:last-child {
+    padding-bottom: 0;
+    border-bottom: 0;
+  }
+
+  .sidebar-related-card img {
+    display: block;
+    width: 82px;
+    height: 62px;
+    object-fit: cover;
+    border-radius: 8px;
+  }
+
+  .sidebar-related-content {
+    min-width: 0;
+  }
+
+  .sidebar-related-content h3 {
+    margin: 0 0 6px;
+    font-size: 14px;
+    line-height: 1.35;
+    font-weight: 700;
+    color: #222;
+  }
+
+  .sidebar-related-content span {
+    font-size: 12px;
+    font-weight: 600;
+    color: #777;
+  }
+
+  .sidebar-related-card:hover h3 {
+    text-decoration: underline;
+  }
+
+  /* SIDEBAR BUTTON */
+  .sidebar-button {
+    display: inline-block;
+    padding: 11px 16px;
+    border-radius: 8px;
+    background: #111;
+    color: white;
+    text-decoration: none;
+    font-weight: 600;
+  }
+
+  /* EXPLORE MORE */
   .sidebar-box ul {
     margin: 0;
     padding: 0;
@@ -505,16 +651,7 @@ const breadcrumbSchema = {
     text-decoration: none;
   }
 
-  .sidebar-button {
-    display: inline-block;
-    padding: 11px 16px;
-    border-radius: 8px;
-    background: #111;
-    color: white;
-    text-decoration: none;
-    font-weight: 600;
-  }
-
+  /* RELATED ARTICLES BELOW */
   .related-section {
     margin-top: 90px;
     padding-top: 60px;
@@ -597,6 +734,7 @@ const breadcrumbSchema = {
     font-weight: 700;
   }
 
+  /* FINAL CTA */
   .final-cta {
     margin-top: 90px;
     padding: 70px 30px;
@@ -635,6 +773,7 @@ const breadcrumbSchema = {
     font-weight: 700;
   }
 
+  /* TABLET */
   @media (max-width: 900px) {
     .article-layout {
       grid-template-columns: 1fr;
@@ -650,6 +789,7 @@ const breadcrumbSchema = {
     }
   }
 
+  /* MOBILE */
   @media (max-width: 600px) {
     .article-page {
       padding-top: 30px;
@@ -678,6 +818,15 @@ const breadcrumbSchema = {
 
     .article-content :global(h2) {
       font-size: 28px;
+    }
+
+    .sidebar-related-card {
+      grid-template-columns: 90px 1fr;
+    }
+
+    .sidebar-related-card img {
+      width: 90px;
+      height: 68px;
     }
 
     .related-grid {

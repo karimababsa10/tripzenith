@@ -2,10 +2,8 @@
 import BaseLayout from "../layouts/BaseLayout.astro";
 import { getCollection } from "astro:content";
 
-// Fetch all articles first — needed by both sections below
 const allArticles = await getCollection("articles");
 
-// Featured Destinations - built dynamically from real articles
 const slugify = (value) =>
   value
     .toLowerCase()
@@ -13,6 +11,7 @@ const slugify = (value) =>
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-+|-+$/g, "");
 
+// Featured Destinations
 const destinationMap = {};
 
 for (const article of allArticles) {
@@ -42,73 +41,208 @@ const featuredDestinations = Object.values(destinationMap)
     articleCount: `${dest.count} Guide${dest.count > 1 ? "s" : ""}`,
   }));
 
-// Latest Articles - pulled dynamically from real content, newest first
+// Latest Articles
 const latestArticles = allArticles
   .sort(
     (a, b) =>
       b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
-  );
+  )
+  .slice(0, 6);
 ---
 
 <BaseLayout
   title="TripZenith — Travel Guides & Inspiration"
-  description="Travel guides, destination ideas, itineraries and practical travel tips for your next adventure."
+  description="Travel guides, destination ideas, itineraries and practical travel tips from a traveler who has explored more than 60 countries."
 >
 
-  <!-- HERO -->
+  <!-- =========================================================
+       HERO
+  ========================================================== -->
 
   <section class="hero">
     <div class="container hero-inner">
 
       <div class="hero-text">
-        <p class="eyebrow">TRAVEL GUIDES & INSPIRATION</p>
+
+        <div class="hero-kicker">
+          <span class="hero-line"></span>
+          TRAVEL GUIDES & INSPIRATION
+        </div>
+
+        <p class="hero-label">
+          BY ALEX MORGAN · 60+ COUNTRIES
+        </p>
 
         <h1>
           Discover your<br />
-          next adventure.
+          <em>next adventure.</em>
         </h1>
 
-        <p class="hero-description">
-          Practical travel guides, beautiful destinations,
-          and ideas to help you plan your next trip.
+        <p class="hero-intro">
+          I've traveled through more than 60 countries, from crowded
+          European capitals to quiet towns most tourists never reach.
+          Along the way, I've learned that the best trips aren't always
+          the most expensive — and the places worth remembering aren't
+          always the ones on the front page of a guidebook.
+        </p>
+
+        <p class="hero-intro">
+          TripZenith is where I share what I've learned: practical travel
+          guides, honest observations, destinations worth your time, and
+          the little details I wish someone had told me before I went.
         </p>
 
         <div class="hero-buttons">
-          <a href="/blog/" class="primary-button">
-            Explore travel guides
+
+          <a href="/destinations/" class="primary-button">
+            Explore destinations
+            <span>→</span>
           </a>
 
-          <a href="/destinations/" class="secondary-button">
-            Browse destinations
+          <a href="/blog/" class="secondary-button">
+            Read my guides
+            <span>→</span>
           </a>
+
         </div>
+
+        <div class="hero-signature">
+          <strong>Alex Morgan</strong>
+          <span>Traveler · 60+ countries</span>
+        </div>
+
       </div>
 
-      <div class="hero-image">
-        <img
-          src="https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1200&q=85"
-          alt="Beautiful travel destination"
-        />
+      <div class="hero-side">
+
+        <div class="hero-image">
+
+          <img
+            src="/images/articles/alex-morgan.jpg"
+            alt="Alex Morgan exploring a destination"
+          />
+
+        </div>
+
+        <div class="hero-image-caption">
+          <span>01</span>
+          <span>Always somewhere new.</span>
+        </div>
+
       </div>
 
     </div>
   </section>
 
 
-  <!-- LATEST ARTICLES -->
+  <!-- =========================================================
+       FEATURED DESTINATIONS
+  ========================================================== -->
 
-  <section class="articles-section">
+  <section class="destinations-section">
+
     <div class="container">
 
       <div class="section-heading">
+
         <div>
-          <p class="eyebrow">LATEST</p>
-          <h2>Latest travel guides</h2>
+
+          <p class="eyebrow">
+            DESTINATIONS
+          </p>
+
+          <h2>
+            Places worth<br />
+            <em>going to.</em>
+          </h2>
+
+        </div>
+
+        <a href="/destinations/" class="view-all">
+          Explore all destinations →
+        </a>
+
+      </div>
+
+
+      <div class="destination-grid">
+
+        {featuredDestinations.map((destination, index) => (
+
+          <a
+            href={destination.link}
+            class={`destination-card destination-card-${index + 1}`}
+          >
+
+            <div class="destination-image">
+
+              <img
+                src={destination.image}
+                alt={`${destination.name}, ${destination.country}`}
+                loading="lazy"
+              />
+
+            </div>
+
+            <div class="destination-overlay"></div>
+
+            <div class="destination-number">
+              0{index + 1}
+            </div>
+
+            <div class="destination-info">
+
+              <p>
+                {destination.country}
+              </p>
+
+              <h3>
+                {destination.name}
+              </h3>
+
+              <span>
+                {destination.articleCount} →
+              </span>
+
+            </div>
+
+          </a>
+
+        ))}
+
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <!-- =========================================================
+       LATEST TRAVEL GUIDES
+  ========================================================== -->
+
+  <section class="articles-section">
+
+    <div class="container">
+
+      <div class="section-heading">
+
+        <div>
+
+          <p class="eyebrow">
+            FROM THE JOURNAL
+          </p>
+
+          <h2>
+            Latest travel guides
+          </h2>
+
         </div>
 
         <a href="/blog/" class="view-all">
-          View all →
+          View all guides →
         </a>
+
       </div>
 
 
@@ -118,7 +252,10 @@ const latestArticles = allArticles
 
           <article class="article-card">
 
-            <a href={`/articles/${article.id}/`} class="image-link">
+            <a
+              href={`/articles/${article.id}/`}
+              class="article-image"
+            >
 
               {article.data.image && (
                 <img
@@ -128,13 +265,25 @@ const latestArticles = allArticles
                 />
               )}
 
+              <span class="article-arrow">
+                ↗
+              </span>
+
             </a>
+
 
             <div class="article-content">
 
               <div class="article-meta">
-                <span>{article.data.category}</span>
-                <span>•</span>
+
+                <span>
+                  {article.data.category}
+                </span>
+
+                <span class="meta-dot">
+                  /
+                </span>
+
                 <span>
                   {article.data.pubDate.toLocaleDateString(
                     "en-US",
@@ -145,23 +294,30 @@ const latestArticles = allArticles
                     }
                   )}
                 </span>
+
               </div>
 
+
               <h3>
+
                 <a href={`/articles/${article.id}/`}>
                   {article.data.title}
                 </a>
+
               </h3>
+
 
               <p>
                 {article.data.description}
               </p>
 
+
               <a
                 href={`/articles/${article.id}/`}
                 class="read-more"
               >
-                Read article →
+                Read guide
+                <span>→</span>
               </a>
 
             </div>
@@ -173,28 +329,89 @@ const latestArticles = allArticles
       </div>
 
     </div>
+
   </section>
 
 
-  <!-- SIMPLE CTA -->
+  <!-- =========================================================
+       TRAVEL PHILOSOPHY
+  ========================================================== -->
+
+  <section class="philosophy-section">
+
+    <div class="container philosophy">
+
+      <div class="philosophy-label">
+
+        <span class="philosophy-line"></span>
+
+        <p>
+          THE TRIPZENITH<br />
+          PHILOSOPHY
+        </p>
+
+      </div>
+
+
+      <div class="philosophy-content">
+
+        <h2>
+          Travel isn't about<br />
+          <em>collecting places.</em>
+        </h2>
+
+        <p>
+          After more than 60 countries, I've learned that the trips
+          I remember most aren't necessarily the ones with the biggest
+          attractions or the most expensive hotels.
+        </p>
+
+        <p>
+          They're the places where I slowed down, wandered without
+          a plan, found a restaurant I didn't expect, or stayed one
+          extra night because something just felt right.
+        </p>
+
+        <a href="/about/" class="philosophy-link">
+          More about my approach
+          <span>→</span>
+        </a>
+
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <!-- =========================================================
+       FINAL CTA
+  ========================================================== -->
 
   <section class="cta-section">
 
     <div class="container cta">
 
-      <p class="eyebrow">PLAN YOUR NEXT TRIP</p>
+      <p class="eyebrow">
+        YOUR NEXT JOURNEY
+      </p>
 
       <h2>
-        Where will you go next?
+        Where will you<br />
+        <em>go next?</em>
       </h2>
 
       <p>
-        Explore our latest destinations, travel guides,
-        and practical tips.
+        Explore destinations, discover practical guides,
+        and start planning your next adventure.
       </p>
 
-      <a href="/destinations/" class="primary-button">
+      <a
+        href="/destinations/"
+        class="primary-button"
+      >
         Explore destinations
+        <span>→</span>
       </a>
 
     </div>
@@ -206,266 +423,733 @@ const latestArticles = allArticles
 
 <style>
 
+/* =========================================================
+   BASE
+========================================================= */
+
+.hero,
+.destinations-section,
+.articles-section,
+.philosophy-section,
+.cta-section {
+  width: 100%;
+}
+
+.hero .container,
+.destinations-section .container,
+.articles-section .container,
+.philosophy-section .container,
+.cta-section .container {
+  width: min(1180px, calc(100% - 48px));
+  margin: 0 auto;
+}
+
+
+/* =========================================================
+   HERO
+========================================================= */
+
+.hero {
+  background: #f4f4f2;
+  color: #111;
+  padding: 105px 0 100px;
+  border-bottom: 1px solid #d8d8d5;
+}
+
+.hero-inner {
+  display: grid;
+  grid-template-columns: 1.12fr 0.88fr;
+  gap: 85px;
+  align-items: center;
+}
+
+.hero-text {
+  max-width: 690px;
+}
+
+.hero-kicker {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 48px;
+  color: #555;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.17em;
+}
+
+.hero-line {
+  width: 42px;
+  height: 1px;
+  background: #111;
+}
+
+.hero-label {
+  margin: 0 0 20px;
+  color: #777;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+}
+
+.hero h1 {
+  margin: 0;
+  font-size: clamp(58px, 7vw, 94px);
+  line-height: 0.94;
+  letter-spacing: -0.055em;
+  font-weight: 700;
+}
+
+.hero h1 em {
+  font-family: Georgia, "Times New Roman", serif;
+  font-weight: 400;
+  letter-spacing: -0.045em;
+}
+
+.hero-intro {
+  max-width: 630px;
+  margin: 29px 0 0;
+  color: #555;
+  font-size: 16px;
+  line-height: 1.8;
+}
+
+.hero-buttons {
+  display: flex;
+  gap: 11px;
+  flex-wrap: wrap;
+  margin-top: 38px;
+}
+
+.primary-button,
+.secondary-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 25px;
+  padding: 15px 20px;
+  text-decoration: none;
+  font-size: 12px;
+  font-weight: 700;
+  transition: all 0.2s ease;
+}
+
+.primary-button {
+  background: #111;
+  color: #fff;
+}
+
+.primary-button:hover {
+  background: #333;
+}
+
+.primary-button span,
+.secondary-button span {
+  font-size: 17px;
+  line-height: 1;
+}
+
+.secondary-button {
+  border: 1px solid #cfcfcb;
+  background: #fff;
+  color: #111;
+}
+
+.secondary-button:hover {
+  background: #e9e9e6;
+  border-color: #aaa;
+}
+
+.hero-signature {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  width: fit-content;
+  margin-top: 42px;
+  padding-top: 20px;
+  border-top: 1px solid #d5d5d2;
+}
+
+.hero-signature strong {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 19px;
+  font-weight: 400;
+}
+
+.hero-signature span {
+  color: #777;
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.hero-side {
+  max-width: 465px;
+  justify-self: end;
+}
+
+.hero-image {
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+  background: #ddd;
+}
+
+.hero-image img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: grayscale(12%);
+}
+
+.hero-image-caption {
+  display: flex;
+  justify-content: space-between;
+  padding-top: 13px;
+  color: #777;
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+
+/* =========================================================
+   SHARED SECTION HEADING
+========================================================= */
+
+.eyebrow {
+  margin: 0 0 13px;
+  color: #777;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+}
+
+.section-heading {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  margin-bottom: 42px;
+}
+
+.section-heading h2 {
+  margin: 0;
+  color: #111;
+  font-size: clamp(35px, 4vw, 50px);
+  line-height: 0.98;
+  letter-spacing: -0.05em;
+}
+
+.section-heading h2 em {
+  font-family: Georgia, "Times New Roman", serif;
+  font-weight: 400;
+}
+
+.view-all {
+  color: #111;
+  font-size: 11px;
+  font-weight: 700;
+  text-decoration: none;
+  letter-spacing: 0.04em;
+  border-bottom: 1px solid #aaa;
+  padding-bottom: 5px;
+}
+
+.view-all:hover {
+  border-color: #111;
+}
+
+
+/* =========================================================
+   FEATURED DESTINATIONS
+========================================================= */
+
+.destinations-section {
+  padding: 105px 0;
+  background: #fff;
+}
+
+.destination-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 15px;
+}
+
+.destination-card {
+  position: relative;
+  display: block;
+  min-height: 430px;
+  overflow: hidden;
+  color: #fff;
+  text-decoration: none;
+  background: #222;
+}
+
+.destination-image {
+  position: absolute;
+  inset: 0;
+}
+
+.destination-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.6s ease;
+}
+
+.destination-card:hover .destination-image img {
+  transform: scale(1.06);
+}
+
+.destination-overlay {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(
+      to bottom,
+      rgba(0,0,0,0.05) 25%,
+      rgba(0,0,0,0.72) 100%
+    );
+}
+
+.destination-number {
+  position: absolute;
+  top: 18px;
+  left: 18px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  opacity: 0.8;
+}
+
+.destination-info {
+  position: absolute;
+  right: 20px;
+  bottom: 21px;
+  left: 20px;
+}
+
+.destination-info p {
+  margin: 0 0 5px;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  opacity: 0.75;
+}
+
+.destination-info h3 {
+  margin: 0 0 10px;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 30px;
+  line-height: 1;
+  font-weight: 400;
+}
+
+.destination-info span {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+}
+
+
+/* =========================================================
+   ARTICLES
+========================================================= */
+
+.articles-section {
+  padding: 105px 0;
+  background: #f4f4f2;
+  border-top: 1px solid #dededb;
+  border-bottom: 1px solid #dededb;
+}
+
+.articles-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 25px;
+}
+
+.article-card {
+  background: #fff;
+  border: 1px solid #dededb;
+  transition:
+    transform 0.25s ease,
+    border-color 0.25s ease;
+}
+
+.article-card:hover {
+  transform: translateY(-4px);
+  border-color: #aaa;
+}
+
+.article-image {
+  position: relative;
+  display: block;
+  height: 245px;
+  overflow: hidden;
+  background: #ddd;
+}
+
+.article-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.45s ease;
+}
+
+.article-card:hover .article-image img {
+  transform: scale(1.04);
+}
+
+.article-arrow {
+  position: absolute;
+  right: 13px;
+  top: 13px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  background: #fff;
+  color: #111;
+  font-size: 16px;
+}
+
+.article-content {
+  padding: 25px;
+}
+
+.article-meta {
+  display: flex;
+  gap: 9px;
+  align-items: center;
+  margin-bottom: 14px;
+  color: #888;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.article-meta span:first-child {
+  color: #111;
+}
+
+.meta-dot {
+  color: #bbb;
+}
+
+.article-content h3 {
+  margin: 0 0 13px;
+  font-size: 21px;
+  line-height: 1.25;
+  letter-spacing: -0.025em;
+}
+
+.article-content h3 a {
+  color: #111;
+  text-decoration: none;
+}
+
+.article-content h3 a:hover {
+  color: #555;
+}
+
+.article-content p {
+  margin: 0 0 20px;
+  color: #666;
+  font-size: 14px;
+  line-height: 1.65;
+}
+
+.read-more {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  color: #111;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-decoration: none;
+  text-transform: uppercase;
+}
+
+.read-more span {
+  font-size: 16px;
+}
+
+.read-more:hover {
+  color: #666;
+}
+
+
+/* =========================================================
+   PHILOSOPHY
+========================================================= */
+
+.philosophy-section {
+  padding: 120px 0;
+  background: #111;
+  color: #fff;
+}
+
+.philosophy {
+  display: grid;
+  grid-template-columns: 0.35fr 1fr;
+  gap: 90px;
+}
+
+.philosophy-label {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+}
+
+.philosophy-line {
+  width: 35px;
+  height: 1px;
+  margin-top: 7px;
+  background: #888;
+}
+
+.philosophy-label p {
+  margin: 0;
+  color: #999;
+  font-size: 9px;
+  font-weight: 700;
+  line-height: 1.7;
+  letter-spacing: 0.15em;
+}
+
+.philosophy-content {
+  max-width: 750px;
+}
+
+.philosophy-content h2 {
+  margin: 0 0 30px;
+  font-size: clamp(43px, 5vw, 67px);
+  line-height: 0.98;
+  letter-spacing: -0.05em;
+}
+
+.philosophy-content h2 em {
+  font-family: Georgia, "Times New Roman", serif;
+  font-weight: 400;
+}
+
+.philosophy-content p {
+  max-width: 680px;
+  margin: 0 0 20px;
+  color: #aaa;
+  font-size: 16px;
+  line-height: 1.8;
+}
+
+.philosophy-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 18px;
+  margin-top: 15px;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-decoration: none;
+  text-transform: uppercase;
+  border-bottom: 1px solid #666;
+  padding-bottom: 7px;
+}
+
+.philosophy-link span {
+  font-size: 17px;
+}
+
+.philosophy-link:hover {
+  border-color: #fff;
+}
+
+
+/* =========================================================
+   FINAL CTA
+========================================================= */
+
+.cta-section {
+  padding: 120px 0;
+  background: #e7e7e4;
+}
+
+.cta {
+  max-width: 700px !important;
+  text-align: center;
+}
+
+.cta .eyebrow {
+  margin-bottom: 20px;
+}
+
+.cta h2 {
+  margin: 0;
+  color: #111;
+  font-size: clamp(50px, 6vw, 78px);
+  line-height: 0.95;
+  letter-spacing: -0.055em;
+}
+
+.cta h2 em {
+  font-family: Georgia, "Times New Roman", serif;
+  font-weight: 400;
+}
+
+.cta > p:not(.eyebrow) {
+  max-width: 500px;
+  margin: 27px auto 32px;
+  color: #666;
+  font-size: 16px;
+  line-height: 1.7;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 1000px) {
+
+  .hero-inner {
+    gap: 50px;
+  }
+
+  .destination-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .destination-card {
+    min-height: 400px;
+  }
+
+  .articles-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .philosophy {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+
+}
+
+
+@media (max-width: 800px) {
+
   .hero {
-    padding: 70px 0 80px;
-    border-bottom: 1px solid #eeeeee;
+    padding: 75px 0 70px;
   }
 
   .hero-inner {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 60px;
-    align-items: center;
+    grid-template-columns: 1fr;
+    gap: 50px;
   }
 
-  .eyebrow {
-    margin: 0 0 14px;
-    color: #2563eb;
-    font-size: 0.75rem;
-    font-weight: 700;
-    letter-spacing: 0.12em;
+  .hero-side {
+    width: 100%;
+    max-width: 520px;
+    justify-self: start;
   }
 
-  h1 {
-    margin: 0;
-    font-size: clamp(2.8rem, 5vw, 4.5rem);
-    line-height: 1.05;
-    letter-spacing: -0.05em;
-    font-weight: 800;
+  .hero h1 {
+    font-size: clamp(54px, 14vw, 76px);
   }
 
-  .hero-description {
-    max-width: 550px;
-    margin: 24px 0 30px;
-    color: #6b7280;
-    font-size: 1.1rem;
-    line-height: 1.7;
+  .hero-intro {
+    font-size: 15px;
+  }
+
+  .section-heading {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 18px;
+  }
+
+  .destinations-section,
+  .articles-section {
+    padding: 80px 0;
+  }
+
+  .philosophy-section {
+    padding: 85px 0;
+  }
+
+  .cta-section {
+    padding: 90px 0;
+  }
+
+}
+
+
+@media (max-width: 600px) {
+
+  .hero .container,
+  .destinations-section .container,
+  .articles-section .container,
+  .philosophy-section .container,
+  .cta-section .container {
+    width: min(100% - 30px, 680px);
+  }
+
+  .hero-kicker {
+    margin-bottom: 35px;
+    font-size: 9px;
+  }
+
+  .hero h1 {
+    font-size: clamp(49px, 14vw, 68px);
   }
 
   .hero-buttons {
-    display: flex;
-    gap: 12px;
-    flex-wrap: wrap;
+    flex-direction: column;
   }
 
   .primary-button,
   .secondary-button {
-    display: inline-block;
-    padding: 12px 20px;
-    border-radius: 8px;
-    text-decoration: none;
-    font-weight: 600;
-    font-size: 0.95rem;
+    width: 100%;
   }
 
-  .primary-button {
-    background: #2563eb;
-    color: white;
-  }
-
-  .primary-button:hover {
-    background: #1d4ed8;
-  }
-
-  .secondary-button {
-    border: 1px solid #d1d5db;
-    color: #374151;
-    background: white;
-  }
-
-  .secondary-button:hover {
-    border-color: #2563eb;
-    color: #2563eb;
+  .hero-signature {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 6px;
   }
 
   .hero-image {
-    height: 480px;
-    overflow: hidden;
-    border-radius: 14px;
+    aspect-ratio: 4 / 5;
   }
 
-  .hero-image img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
+  .destination-grid {
+    grid-template-columns: 1fr;
   }
 
-
-  /* ARTICLES */
-
-  .articles-section {
-    padding: 90px 0;
-  }
-
-  .section-heading {
-    display: flex;
-    align-items: end;
-    justify-content: space-between;
-    margin-bottom: 35px;
-  }
-
-  .section-heading h2 {
-    margin: 0;
-    font-size: 2.2rem;
-    letter-spacing: -0.04em;
-  }
-
-  .view-all {
-    color: #2563eb;
-    text-decoration: none;
-    font-weight: 600;
+  .destination-card {
+    min-height: 430px;
   }
 
   .articles-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 30px;
+    grid-template-columns: 1fr;
   }
 
-  .article-card {
-    border: 1px solid #e5e7eb;
-    border-radius: 12px;
-    overflow: hidden;
-    background: white;
+  .article-image {
+    height: 235px;
   }
 
-  .image-link {
-    display: block;
-    height: 220px;
-    overflow: hidden;
-  }
-
-  .image-link img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
-    transition: transform 0.3s ease;
-  }
-
-  .article-card:hover .image-link img {
-    transform: scale(1.03);
-  }
-
-  .article-content {
-    padding: 22px;
-  }
-
-  .article-meta {
-    display: flex;
-    gap: 8px;
-    margin-bottom: 12px;
-    color: #6b7280;
-    font-size: 0.78rem;
-  }
-
-  .article-meta span:first-child {
-    color: #2563eb;
-    font-weight: 600;
-  }
-
-  .article-content h3 {
-    margin: 0 0 12px;
-    font-size: 1.35rem;
-    line-height: 1.3;
-  }
-
-  .article-content h3 a {
-    color: #111827;
-    text-decoration: none;
-  }
-
-  .article-content h3 a:hover {
-    color: #2563eb;
-  }
-
-  .article-content p {
-    margin: 0 0 18px;
-    color: #6b7280;
-    font-size: 0.95rem;
-    line-height: 1.6;
-  }
-
-  .read-more {
-    color: #2563eb;
-    font-weight: 600;
-    font-size: 0.9rem;
-    text-decoration: none;
-  }
-
-
-  /* CTA */
-
-  .cta-section {
-    padding: 90px 0;
-    background: #f8fafc;
-  }
-
-  .cta {
-    text-align: center;
-    max-width: 650px;
+  .philosophy-content h2 {
+    font-size: 48px;
   }
 
   .cta h2 {
-    margin: 0 0 15px;
-    font-size: 2.5rem;
-    letter-spacing: -0.04em;
+    font-size: 52px;
   }
 
-  .cta p:not(.eyebrow) {
-    margin: 0 auto 25px;
-    color: #6b7280;
-  }
-
-
-  /* MOBILE */
-
-  @media (max-width: 850px) {
-
-    .hero {
-      padding: 50px 0 60px;
-    }
-
-    .hero-inner {
-      grid-template-columns: 1fr;
-      gap: 35px;
-    }
-
-    .hero-image {
-      height: 350px;
-    }
-
-    .articles-grid {
-      grid-template-columns: repeat(2, 1fr);
-    }
-
-  }
-
-  @media (max-width: 600px) {
-
-    .container {
-      width: min(100% - 30px, 1180px);
-    }
-
-    .hero-image {
-      height: 280px;
-    }
-
-    .section-heading {
-      align-items: flex-start;
-      flex-direction: column;
-      gap: 12px;
-    }
-
-    .articles-grid {
-      grid-template-columns: 1fr;
-    }
-
-    .cta h2 {
-      font-size: 2rem;
-    }
-
-  }
-
+}
 </style>

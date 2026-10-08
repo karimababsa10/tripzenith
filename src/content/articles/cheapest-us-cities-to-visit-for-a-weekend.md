@@ -5,8 +5,8 @@ pubDate: 2026-10-08
 image: "https://raw.githubusercontent.com/karimababsa10/tripzenith/main/public/blog-images/cheapest-us-cities-to-visit-for-a-weekend-152.png"
 category: "Destinations"
 destination: "United States"
-country: "USA"
-region: "North America"
+country: "United States"
+region: "Americas"
 tags:
  - budget weekend getaways
  -  affordable us cities
